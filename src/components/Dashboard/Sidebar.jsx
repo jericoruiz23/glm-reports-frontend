@@ -82,7 +82,7 @@ export default function Sidebar({ isOpen, mobileOpen }) {
                                 </NavLink>
                                 <NavLink to="/despacho">
                                     <img src={Dispatch} alt="Despacho" className="sidebar-icon" />
-                                    <span>Despacho</span>
+                                    <span>Despachos</span>
                                 </NavLink>
                             </div>
                         )}
