@@ -5,6 +5,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import toast, { Toaster } from "react-hot-toast";
+import api from "../../services/api";
 
 // Utils
 const getISOWeek = (dateString) => {
@@ -62,11 +63,9 @@ export default function ModalCreateImport({ open, onClose, onCreated }) {
 
     // Fetch forwarders y consecutivo
     useEffect(() => {
-        const token = localStorage.getItem("token");
         const fetchForwarders = async () => {
             try {
-                const res = await fetch(`${process.env.REACT_APP_BACKEND_IP_PORT}/api/imports/options`, { headers: { Authorization: `Bearer ${token}` } });
-                const data = await res.json();
+                const data = await api.get("/api/imports/options");
                 setForwarders(Array.isArray(data.forwarders) ? data.forwarders : []);
             } catch {
                 setForwarders([{ value: "FWD-A", label: "Forwarder A" }, { value: "FWD-B", label: "Forwarder B" }]);
@@ -74,8 +73,7 @@ export default function ModalCreateImport({ open, onClose, onCreated }) {
         };
         const fetchConsecutive = async () => {
             try {
-                const res = await fetch(`${process.env.REACT_APP_BACKEND_IP_PORT}/api/imports/last?importType=${form.importType}&importCategory=${form.importCategory}&year=${currentYear}`, { headers: { Authorization: `Bearer ${token}` } });
-                const data = await res.json();
+                const data = await api.get(`/api/imports/last?importType=${form.importType}&importCategory=${form.importCategory}&year=${currentYear}`);
                 setLastConsecutive(data.nextConsecutive || "001");
             } catch {
                 setLastConsecutive("001");
@@ -99,14 +97,7 @@ export default function ModalCreateImport({ open, onClose, onCreated }) {
 
     const handleSubmit = async () => {
         try {
-            const token = localStorage.getItem("token");
-            const res = await fetch(`${process.env.REACT_APP_BACKEND_IP_PORT}/api/imports`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-                body: JSON.stringify({ ...form, year: currentYear, consecutive: lastConsecutive })
-            });
-            if (!res.ok) throw new Error((await res.json()).message || "Error creación import");
-            const nuevo = await res.json();
+            const nuevo = await api.post("/api/imports", { ...form, year: currentYear, consecutive: lastConsecutive });
             toast.success("Importación creada");
             onCreated(nuevo);
             onClose();

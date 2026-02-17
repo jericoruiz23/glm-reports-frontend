@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Box, TextField, Button } from "@mui/material";
 import toast from "react-hot-toast";
+import api from "../../../services/api";
 
 const style = {
     position: "absolute",
@@ -25,15 +26,7 @@ export default function ModalEditBills({ open, onClose, bill, refresh }) {
 
     const handleSubmit = async () => {
         try {
-            const res = await fetch(`${process.env.REACT_APP_BACKEND_IP_PORT}/bills/update/${bill._id}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify(form),
-            });
-
-            if (!res.ok) throw new Error("Error al actualizar factura");
-
+            await api.put(`/bills/update/${bill._id}`, form);
             toast.success("Factura actualizada");
             refresh();
             onClose();

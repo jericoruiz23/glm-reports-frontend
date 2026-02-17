@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, Stack, TextField, Button, Typography } from "@mui/material";
 import toast from "react-hot-toast";
+import api from "../../../services/api";
 
 export default function FormDespacho({ data, onUpdated }) {
     const [form, setForm] = useState({
@@ -33,16 +34,7 @@ export default function FormDespacho({ data, onUpdated }) {
 
     const handleSave = async () => {
         try {
-            const token = localStorage.getItem("token");
-            const res = await fetch(`${process.env.REACT_APP_BACKEND_IP_PORT}/api/bills/${data._id}/step2`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-                body: JSON.stringify(form),
-            });
-
-            if (!res.ok) throw new Error("Error al actualizar despacho");
-
-            const updated = await res.json();
+            const updated = await api.put(`/api/bills/${data._id}/step2`, form);
             toast.success("Datos de despacho actualizados");
             if (onUpdated) onUpdated(updated);
         } catch (err) {

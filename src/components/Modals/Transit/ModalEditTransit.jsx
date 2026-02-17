@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Drawer, Tabs, Tab, Box, Button, TextField } from "@mui/material";
 import toast from "react-hot-toast";
+import api from "../../../services/api";
 
 export default function EditTransitDrawer({ open, onClose, data, onUpdated }) {
     const [tab, setTab] = useState(0);
@@ -37,29 +38,11 @@ export default function EditTransitDrawer({ open, onClose, data, onUpdated }) {
 
     const handleSave = async () => {
         try {
-            const token = localStorage.getItem("token");
-
             const payload = { ...form };
-
-            const res = await fetch(
-                `${process.env.REACT_APP_BACKEND_IP_PORT}/api/transit/${data._id}`,
-                {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify(payload),
-                }
-            );
-
-            if (!res.ok) throw new Error("Error al actualizar");
-
-            const updated = await res.json();
+            const updated = await api.put(`/api/transit/${data._id}`, payload);
             toast.success("Registro actualizado");
             onUpdated(updated);
             onClose();
-
         } catch (err) {
             console.error(err);
             toast.error("No se pudo actualizar");

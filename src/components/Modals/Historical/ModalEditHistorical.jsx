@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Drawer, Box, Typography, TextField, Stack, Button } from "@mui/material";
 import toast from "react-hot-toast";
+import api from "../../../services/api";
 
 export default function ModalEditHistorical({ open, onClose, data, onUpdated, loading: externalLoading }) {
     const [form, setForm] = useState(null);
@@ -24,24 +25,9 @@ export default function ModalEditHistorical({ open, onClose, data, onUpdated, lo
 
         try {
             setLoading(true);
-            const token = localStorage.getItem("token");
-            const res = await fetch(`${process.env.REACT_APP_BACKEND_IP_PORT}/api/historical/${form._id}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify(form),
-            });
-
-            if (!res.ok) {
-                const errData = await res.json();
-                throw new Error(errData.error || "Error actualizando histórico");
-            }
-
-            const updated = await res.json();
+            const updated = await api.put(`/api/historical/${form._id}`, form);
             toast.success("Histórico actualizado");
-            if (onUpdated) onUpdated(updated); // enviamos el objeto actualizado al parent
+            if (onUpdated) onUpdated(updated);
             onClose();
         } catch (err) {
             console.error(err);

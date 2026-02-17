@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import toast from "react-hot-toast";
+import api from "../../services/api";
 
 export default function ModalCreateProcessDrawer({ open, onClose, onCreated }) {
 
@@ -48,20 +49,7 @@ export default function ModalCreateProcessDrawer({ open, onClose, onCreated }) {
 
     const handleSubmit = async () => {
         try {
-            const token = localStorage.getItem("token");
-
-            const res = await fetch(`${process.env.REACT_APP_BACKEND_IP_PORT}/api/procesos`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(form),
-            });
-
-            if (!res.ok) throw new Error("Error al crear proceso");
-
-            const newProceso = await res.json();
+            const newProceso = await api.post("/api/procesos", form);
             toast.success("Proceso creado correctamente");
             onCreated(newProceso);
             onClose();

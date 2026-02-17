@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Drawer, Tabs, Tab, Box, Button, TextField } from "@mui/material";
 import toast from "react-hot-toast";
+import api from "../../services/api";
 
 // Helper para formatear fechas
 const formatDate = (d) => (d ? d.substring(0, 10) : "");
@@ -44,8 +45,6 @@ export default function EditPreshipmentDrawer({ open, onClose, data, onUpdated }
 
     const handleSave = async () => {
         try {
-            const token = localStorage.getItem("token");
-
             // Mapear nombres del frontend ➜ backend
             const payload = {
                 status: form.status,
@@ -86,21 +85,7 @@ export default function EditPreshipmentDrawer({ open, onClose, data, onUpdated }
                 importCode: form.importCode,
             };
 
-            const res = await fetch(
-                `${process.env.REACT_APP_BACKEND_IP_PORT}/api/preshipments/${data._id}`,
-                {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify(payload),
-                }
-            );
-
-            if (!res.ok) throw new Error("Error al actualizar preembarque");
-
-            const updated = await res.json();
+            const updated = await api.put(`/api/preshipments/${data._id}`, payload);
 
             toast.success("Pre-embarque actualizado");
             onUpdated(updated);

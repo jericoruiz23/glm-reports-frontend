@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { TextField, Button } from "@mui/material";
 import toast from "react-hot-toast";
+import api from "../../services/api";
 
 export default function CreateProviderForm({ onProviderCreated }) {
     const [name, setName] = useState("");
@@ -12,21 +13,8 @@ export default function CreateProviderForm({ onProviderCreated }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const token = localStorage.getItem("token"); // toma el token si tu API lo requiere
             const newProviderData = { name, email, phone, address, category };
-
-            const res = await fetch(`${process.env.BACKEND_IP_PORT}/api/auth/providers`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(newProviderData),
-            });
-
-            if (!res.ok) throw new Error("Error al crear proveedor");
-
-            const createdProvider = await res.json(); // respuesta del backend con _id
+            const createdProvider = await api.post("/api/auth/providers", newProviderData);
             onProviderCreated(createdProvider); // actualiza la tabla en ManageProviders
             toast.success("Proveedor creado correctamente");
 

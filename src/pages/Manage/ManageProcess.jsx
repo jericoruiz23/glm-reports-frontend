@@ -11,6 +11,7 @@ import ModalEditUser from "../../components/Modals/ModalEditUser";
 import { useMediaQuery } from "@mui/material";
 import ModalProcesoDetalle from "../../components/Modals/ModalProcessDetail";
 import ModalCreateProcess from "../../components/Modals/ModalCreateProcess";
+import api from "../../services/api";
 
 
 export default function ManageUsers() {
@@ -28,17 +29,7 @@ export default function ManageUsers() {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const token = localStorage.getItem("token");
-                const res = await fetch(`${process.env.REACT_APP_BACKEND_IP_PORT}/api/procesos`, {
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`,
-                    },
-                });
-
-                if (!res.ok) throw new Error("Error al cargar usuarios");
-
-                const data = await res.json();
+                const data = await api.get("/api/procesos");
                 setUsers(data);
             } catch (err) {
                 console.error(err);
@@ -91,19 +82,7 @@ export default function ManageUsers() {
                     <button
                         onClick={async () => {
                             try {
-                                const token = localStorage.getItem("token");
-                                const res = await fetch(
-                                    `${process.env.REACT_APP_BACKEND_IP_PORT}/api/procesos/${id}`,
-                                    {
-                                        method: "DELETE",
-                                        headers: {
-                                            "Content-Type": "application/json",
-                                            Authorization: `Bearer ${token}`,
-                                        },
-                                    }
-                                );
-                                if (!res.ok)
-                                    throw new Error("Error al eliminar el proceso");
+                                await api.del(`/api/procesos/${id}`);
 
                                 setUsers(users.filter((u) => u._id !== id));
                                 toast.success("Proceso eliminado correctamente");
@@ -430,22 +409,8 @@ export default function ManageUsers() {
                     );
                     setOpenEdit(false);
 
-                    const token = localStorage.getItem("token");
-                    fetch(
-                        `${process.env.REACT_APP_BACKEND_IP_PORT}/api/procesos/${updatedUser._id}`,
-                        {
-                            method: "PUT",
-                            headers: {
-                                "Content-Type": "application/json",
-                                Authorization: `Bearer ${token}`,
-                            },
-                            body: JSON.stringify(updatedUser),
-                        }
-                    )
-                        .then((res) => {
-                            if (!res.ok) throw new Error("Error al actualizar");
-                            toast.success("Proceso actualizado");
-                        })
+                    api.put(`/api/procesos/${updatedUser._id}`, updatedUser)
+                        .then(() => toast.success("Proceso actualizado"))
                         .catch(() => toast.error("Error al actualizar"));
                 }}
             />

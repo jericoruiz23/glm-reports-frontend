@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, TextField, Button, Grid, Typography, Divider, MenuItem } from "@mui/material";
 import toast from "react-hot-toast";
+import api from "../../../services/api";
 
 export default function FormFactura({ onSaved }) {
     const [loading, setLoading] = useState(false);
@@ -32,28 +33,8 @@ export default function FormFactura({ onSaved }) {
     useEffect(() => {
         const fetchCatalogo = async () => {
             try {
-                const url = `${process.env.REACT_APP_BACKEND_IP_PORT}/api/catalogs`;
-                console.log("🌐 Fetching catálogo desde:", url);
-
-                const res = await fetch(url);
-                const raw = await res.text();
-                console.log("📥 RAW RESPONSE:", raw);
-
-                let data;
-                try {
-                    data = JSON.parse(raw);
-                } catch (err) {
-                    console.error("❌ ERROR PARSEANDO JSON:", err);
-                    return;
-                }
-
-                if (!res.ok) {
-                    toast.error("Error cargando catálogo");
-                    return;
-                }
-
+                const data = await api.get("/api/catalogs");
                 console.log("📌 Catalogo recibido:", data);
-
                 setOrigenOptions(data.paisesOrigen || []);
                 setDestinoOptions(data.paisesDestino || []);
             } catch (error) {
@@ -105,19 +86,7 @@ export default function FormFactura({ onSaved }) {
         setLoading(true);
 
         try {
-            const res = await fetch(`${process.env.REACT_APP_BACKEND_IP_PORT}/api/bills/step1`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                toast.error(data.error || "Error al guardar");
-                setLoading(false);
-                return;
-            }
+            const data = await api.post("/api/bills/step1", formData);
 
             toast.success("Datos guardados correctamente");
 
@@ -141,7 +110,7 @@ export default function FormFactura({ onSaved }) {
 
         } catch (error) {
             console.error(error);
-            toast.error("Error de conexión");
+            toast.error(error.message || "Error de conexión");
         }
 
         setLoading(false);

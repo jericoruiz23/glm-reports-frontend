@@ -6,6 +6,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import toast from "react-hot-toast";
+import api from "../../services/api";
 
 function getISOWeek(dateString) {
     if (!dateString) return "";
@@ -39,8 +40,7 @@ export default function EditImportDrawer({ open, onClose, data, loading, onUpdat
     useEffect(() => {
         const fetchOptions = async () => {
             try {
-                const res = await fetch(`${process.env.REACT_APP_BACKEND_IP_PORT}/api/imports/options`);
-                const data = await res.json();
+                const data = await api.get("/api/imports/options");
                 setOptions({
                     forwarders: data.forwarders || [],
                     mot: data.mot || [],
@@ -83,17 +83,7 @@ export default function EditImportDrawer({ open, onClose, data, loading, onUpdat
 
     const handleSave = async () => {
         try {
-            const token = localStorage.getItem("token");
-            const res = await fetch(`${process.env.REACT_APP_BACKEND_IP_PORT}/api/imports/${form._id}`, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(form),
-            });
-            if (!res.ok) throw new Error("Error update");
-            const updated = await res.json();
+            const updated = await api.put(`/api/imports/${form._id}`, form);
             onUpdated(updated);
             onClose();
         } catch (err) {

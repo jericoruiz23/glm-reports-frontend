@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import toast from "react-hot-toast";
+import api from "../../services/api";
 
 export default function ModalCreatePreshipment({ open, onClose, onCreated, procesos = [] }) {
     const [form, setForm] = useState({
@@ -55,27 +56,17 @@ export default function ModalCreatePreshipment({ open, onClose, onCreated, proce
         }
 
         try {
-            const res = await fetch(`${process.env.REACT_APP_BACKEND_IP_PORT}/api/preshipments`, {
-                method: "POST",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(form),
-            });
-
-            if (res.status === 401) {
-                toast.error("Sesión expirada. Vuelve a iniciar sesión.");
-                return;
-            }
-
-            if (!res.ok) throw new Error("Error al crear preembarque");
-
-            const nuevo = await res.json();
+            const nuevo = await api.post("/api/preshipments", form);
             toast.success("Preembarque creado");
-            onCreated(nuevo); // Actualiza la tabla
+            onCreated(nuevo);
             onClose();
         } catch (err) {
             console.error(err);
-            toast.error("Error al crear preembarque");
+            if (err.message?.includes("401")) {
+                toast.error("Sesión expirada. Vuelve a iniciar sesión.");
+            } else {
+                toast.error("Error al crear preembarque");
+            }
         }
     };
 

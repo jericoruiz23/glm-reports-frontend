@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, Stack, TextField, Button, Typography, MenuItem } from "@mui/material";
 import toast from "react-hot-toast";
+import api from "../../../services/api";
 
 export default function FormLogisticaInline({ data, onUpdated }) {
     const [form, setForm] = useState({
@@ -43,14 +44,7 @@ export default function FormLogisticaInline({ data, onUpdated }) {
 
     const handleSave = async () => {
         try {
-            const token = localStorage.getItem("token");
-            const res = await fetch(`${process.env.REACT_APP_BACKEND_IP_PORT}/api/bills/${data._id}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-                body: JSON.stringify(form),
-            });
-            if (!res.ok) throw new Error("Error al actualizar logística");
-            const updated = await res.json();
+            const updated = await api.put(`/api/bills/${data._id}`, form);
             toast.success("Datos de logística actualizados");
             if (onUpdated) onUpdated(updated);
         } catch (err) {

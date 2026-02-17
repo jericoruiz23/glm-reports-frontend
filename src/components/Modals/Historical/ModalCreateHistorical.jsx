@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { Drawer, Box, Typography, TextField, Stack, Button } from "@mui/material";
 import toast from "react-hot-toast";
+import api from "../../../services/api";
 
 export default function ModalCreateHistorical({ open, onClose, onCreated }) {
     const [form, setForm] = useState({
@@ -18,14 +19,7 @@ export default function ModalCreateHistorical({ open, onClose, onCreated }) {
 
     const handleSave = async () => {
         try {
-            const token = localStorage.getItem("token");
-            const res = await fetch(`${process.env.REACT_APP_BACKEND_IP_PORT}/api/historical`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-                body: JSON.stringify(form),
-            });
-
-            if (!res.ok) throw new Error("Error creando histórico");
+            await api.post("/api/historical", form);
             toast.success("Histórico creado");
             onCreated();
         } catch (err) {

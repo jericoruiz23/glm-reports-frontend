@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import Layout from "../../components/Dashboard/Layout";
 import ModalCreateImport from "../../components/Modals/ModalCreateImport";
 import ModalEditImport from "../../components/Modals/ModalEditImport";
+import api from "../../services/api";
 
 export default function ManageImports() {
     const [imports, setImports] = useState([]);
@@ -18,16 +19,7 @@ export default function ManageImports() {
     // Fetch de todos los imports
     const fetchData = async () => {
         try {
-            const token = localStorage.getItem("token");
-            const res = await fetch(`${process.env.REACT_APP_BACKEND_IP_PORT}/api/imports`, {
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            if (!res.ok) throw new Error("Error al cargar imports");
-
-            const data = await res.json();
+            const data = await api.get("/api/imports");
             setImports(data.data || []);
         } catch (err) {
             console.error(err);
@@ -41,15 +33,7 @@ export default function ManageImports() {
     const fetchById = async (id) => {
         try {
             setLoadingDetails(true);
-            const token = localStorage.getItem("token");
-            const res = await fetch(`${process.env.REACT_APP_BACKEND_IP_PORT}/api/imports/${id}`, {
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            if (!res.ok) throw new Error("Error al cargar detalle");
-            const data = await res.json();
+            const data = await api.get(`/api/imports/${id}`);
             setSelectedImport(data);
             setOpenDrawer(true); // Se abre el Drawer solo cuando hay data
         } catch (err) {

@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import dayjs from "dayjs";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import api from "../../../services/api";
 
 /* =========================
    FORM BASE
@@ -77,17 +78,7 @@ export default function ModalEditPreshipment({
 
         const fetchCatalogos = async () => {
             try {
-                const res = await fetch(
-                    `${process.env.REACT_APP_API_URL}/api/catalogos`,
-                    {
-                        credentials: "include",
-                        headers: { "Content-Type": "application/json" },
-                    }
-                );
-
-                if (!res.ok) throw new Error("Error al obtener catálogos");
-
-                const data = await res.json();
+                const data = await api.get("/api/catalogos");
                 console.log(data, "catalogos edit preshipment");
 
                 setCatalogos({
@@ -151,18 +142,7 @@ export default function ModalEditPreshipment({
         if (!window.confirm("¿Estás seguro de eliminar este pre-embarque?")) return;
 
         try {
-            const token = localStorage.getItem("token");
-            const res = await fetch(
-                `${process.env.REACT_APP_API_URL}/api/process/${form._id}`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-
-            if (!res.ok) throw new Error();
+            await api.del(`/api/process/${form._id}`);
 
             toast.success("Pre-embarque eliminado");
             onDeleted?.(form._id);
@@ -182,9 +162,6 @@ export default function ModalEditPreshipment({
                 return;
             }
 
-            const token = localStorage.getItem("token");
-            const url = `${process.env.REACT_APP_API_URL}/api/process/${form._id}`;
-
             let stageFields = {};
 
             if (stage === "preembarque") {
@@ -193,19 +170,7 @@ export default function ModalEditPreshipment({
             }
 
             const payload = { [stage]: stageFields };
-
-            const res = await fetch(url, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(payload),
-            });
-
-            if (!res.ok) throw new Error();
-
-            const updated = await res.json();
+            const updated = await api.put(`/api/process/${form._id}`, payload);
             toast.success("Pre-embarque actualizado");
             onUpdated?.(updated);
             onClose();
@@ -260,26 +225,28 @@ export default function ModalEditPreshipment({
                 </TextField>
 
 
-                <TextField fullWidth type="number" label="Valor Factura" name="valorFactura" value={form.valorFactura} onChange={handleChange} sx={{ mb: 2 }} />
-                {catalogos.FORMAS_PAGO.map(fp => {
-                    const value = fp.valor ?? fp.nombre ?? "";
-                    return (
-                        <MenuItem key={fp._id || value} value={value}>
-                            {value}
-                        </MenuItem>
-                    );
-                })}
+                <TextField fullWidth type="number" label="Valor Factura" name="valorFactura" value={form.valorFactura} onChange={handleChange} sx={{ mb: 2 }}>
+                    {catalogos.FORMAS_PAGO.map(fp => {
+                        const value = fp.valor ?? fp.nombre ?? "";
+                        return (
+                            <MenuItem key={fp._id || value} value={value}>
+                                {value}
+                            </MenuItem>
+                        );
+                    })}
+                </TextField>
 
 
-                <TextField fullWidth type="number" label="Cantidad" name="cantidad" value={form.cantidad} onChange={handleChange} sx={{ mb: 2 }} />
-                {catalogos.UNIDADES_METRICAS.map(u => {
-                    const value = u.valor ?? u.nombre ?? "";
-                    return (
-                        <MenuItem key={u._id || value} value={value}>
-                            {value}
-                        </MenuItem>
-                    );
-                })}
+                <TextField fullWidth type="number" label="Cantidad" name="cantidad" value={form.cantidad} onChange={handleChange} sx={{ mb: 2 }}>
+                    {catalogos.UNIDADES_METRICAS.map(u => {
+                        const value = u.valor ?? u.nombre ?? "";
+                        return (
+                            <MenuItem key={u._id || value} value={value}>
+                                {value}
+                            </MenuItem>
+                        );
+                    })}
+                </TextField>
 
 
                 <TextField
@@ -372,15 +339,16 @@ export default function ModalEditPreshipment({
 
             {/* DOCUMENTOS */}
             <Box hidden={tab !== 2} mt={2}>
-                <TextField fullWidth label="Carta Reg 21" name="cartaReg21" value={form.cartaReg21} onChange={handleChange} sx={{ mb: 2 }} />
-                {catalogos.ASEGURADORA.map(a => {
-                    const value = a.valor ?? a.nombre ?? "";
-                    return (
-                        <MenuItem key={a._id || value} value={value}>
-                            {value}
-                        </MenuItem>
-                    );
-                })}
+                <TextField fullWidth label="Carta Reg 21" name="cartaReg21" value={form.cartaReg21} onChange={handleChange} sx={{ mb: 2 }}>
+                    {catalogos.ASEGURADORA.map(a => {
+                        const value = a.valor ?? a.nombre ?? "";
+                        return (
+                            <MenuItem key={a._id || value} value={value}>
+                                {value}
+                            </MenuItem>
+                        );
+                    })}
+                </TextField>
 
 
                 <TextField fullWidth label="Número Garantía" name="numeroGarantia" value={form.numeroGarantia} onChange={handleChange} sx={{ mb: 2 }} />
@@ -390,14 +358,25 @@ export default function ModalEditPreshipment({
                 <TextField fullWidth label="Certificado Origen" name="certificadoOrigen" value={form.certificadoOrigen} onChange={handleChange} sx={{ mb: 2 }} />
                 <TextField fullWidth label="Lista Empaque" name="listaEmpaque" value={form.listaEmpaque} onChange={handleChange} sx={{ mb: 2 }} />
                 <TextField fullWidth label="Carta Gastos" name="cartaGastos" value={form.cartaGastos} onChange={handleChange} sx={{ mb: 2 }} />
-                {catalogos.PAIS_ORIGEN.map(p => {
-                    const value = p.valor ?? p.nombre ?? p.label ?? "";
-                    return (
-                        <MenuItem key={p._id || value} value={value}>
-                            {value}
-                        </MenuItem>
-                    );
-                })}
+                <TextField
+                    select
+                    fullWidth
+                    label="País Origen"
+                    name="paisOrigen"
+                    value={form.paisOrigen || ""}
+                    onChange={handleChange}
+                    sx={{ mb: 2 }}
+                >
+                    <MenuItem value="">Seleccionar</MenuItem>
+                    {catalogos.PAIS_ORIGEN.map(p => {
+                        const value = p.valor ?? p.nombre ?? p.label ?? "";
+                        return (
+                            <MenuItem key={p._id || value} value={value}>
+                                {value}
+                            </MenuItem>
+                        );
+                    })}
+                </TextField>
 
             </Box>
 

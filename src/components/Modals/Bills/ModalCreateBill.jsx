@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Modal, Box, TextField, Button } from "@mui/material";
 import toast from "react-hot-toast";
+import api from "../../../services/api";
 
 const style = {
     position: "absolute",
@@ -26,15 +27,7 @@ export default function ModalCreateBills({ open, onClose, refresh }) {
 
     const handleSubmit = async () => {
         try {
-            const res = await fetch(`${process.env.REACT_APP_BACKEND_IP_PORT}/bills/create`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "include",
-                body: JSON.stringify(form),
-            });
-
-            if (!res.ok) throw new Error("Error al crear factura");
-
+            await api.post("/bills/create", form);
             toast.success("Factura creada");
             refresh();
             onClose();

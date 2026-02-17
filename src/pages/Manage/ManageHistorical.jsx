@@ -7,6 +7,7 @@ import Layout from "../../components/Dashboard/Layout";
 import ModalViewBill from "../../components/Modals/Historical/ModalViewBill";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import api from "../../services/api";
 
 export default function ManageBills() {
     const [bills, setBills] = useState([]);
@@ -19,15 +20,7 @@ export default function ManageBills() {
     // Fetch de todos los bills
     const fetchData = async () => {
         try {
-            const token = localStorage.getItem("token");
-            const res = await fetch(`${process.env.REACT_APP_BACKEND_IP_PORT}/api/bills`, {
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            if (!res.ok) throw new Error("Error al cargar facturas");
-            const data = await res.json();
+            const data = await api.get("/api/bills");
             setBills(data || []);
         } catch (err) {
             console.error(err);
@@ -81,15 +74,7 @@ export default function ManageBills() {
     const fetchById = async (id) => {
         try {
             setLoadingDetails(true);
-            const token = localStorage.getItem("token");
-            const res = await fetch(`${process.env.REACT_APP_BACKEND_IP_PORT}/api/bills/${id}`, {
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            if (!res.ok) throw new Error("Error al cargar detalle de factura");
-            const data = await res.json();
+            const data = await api.get(`/api/bills/${id}`);
             setSelectedBill(data);
             setOpenDrawer(true);
         } catch (err) {

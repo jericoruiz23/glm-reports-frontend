@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import Layout from "../../../components/Dashboard/Layout";
 import ModalCreateTransit from "../../../components/Modals/Transit/ModalCreateTransit";
 import ModalViewTransit from "../../../components/Modals/Transit/ModalEditTransit";
+import api from "../../../services/api";
 
 export default function ManageTransitTime() {
     const [transits, setTransits] = useState([]);
@@ -17,15 +18,7 @@ export default function ManageTransitTime() {
 
     const fetchData = async () => {
         try {
-            const token = localStorage.getItem("token");
-            const res = await fetch(`${process.env.REACT_APP_BACKEND_IP_PORT}/api/transit`, {
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            if (!res.ok) throw new Error("Error al cargar registros");
-            const data = await res.json();
+            const data = await api.get("/api/transit");
             setTransits(data);
         } catch (err) {
             console.error(err);
@@ -38,15 +31,7 @@ export default function ManageTransitTime() {
     const fetchById = async (id) => {
         try {
             setLoadingDetails(true);
-            const token = localStorage.getItem("token");
-            const res = await fetch(`${process.env.REACT_APP_BACKEND_IP_PORT}/api/transit/${id}`, {
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            if (!res.ok) throw new Error("Error al cargar detalle");
-            const data = await res.json();
+            const data = await api.get(`/api/transit/${id}`);
             setSelectedTransit(data);
         } catch (err) {
             console.error(err);

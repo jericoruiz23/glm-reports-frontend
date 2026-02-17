@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import toast from "react-hot-toast";
+import api from "../../../services/api";
 
 export default function ModalCreateTransit({ open, onClose, onCreated }) {
     const [form, setForm] = useState({
@@ -30,19 +31,7 @@ export default function ModalCreateTransit({ open, onClose, onCreated }) {
 
     const handleSubmit = async () => {
         try {
-            const token = localStorage.getItem("token");
-            const res = await fetch(`${process.env.REACT_APP_BACKEND_IP_PORT}/api/transit`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(form),
-            });
-
-            if (!res.ok) throw new Error("Error al crear registro");
-
-            const nuevo = await res.json();
+            const nuevo = await api.post("/api/transit", form);
             toast.success("Registro creado");
             onCreated(nuevo);
             onClose();
