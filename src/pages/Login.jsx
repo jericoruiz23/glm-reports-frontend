@@ -26,38 +26,43 @@ const providers = [{ id: "credentials", name: "Credenciales" }];
 
 function CustomEmailField() {
     return (
-        <TextField
-            label="Correo electrónico"
-            name="email"
-            type="email"
-            size="small"
-            required
-            fullWidth
-            InputProps={{
-                startAdornment: (
-                    <InputAdornment position="start">
+        <FormControl fullWidth variant="outlined" sx={{ my: 2 }}>
+            <InputLabel htmlFor="email-input" size="small">
+                Correo electrónico
+            </InputLabel>
+
+            <OutlinedInput
+                id="email-input"
+                name="email"
+                type="email"
+                size="small"
+                label="Correo electrónico"
+                endAdornment={
+                    <InputAdornment position="end">
                         <AccountCircle fontSize="inherit" />
                     </InputAdornment>
-                ),
-                sx: {
+                }
+                sx={{
                     borderRadius: "15px",
                     background: "rgba(255,255,255,0.3)",
                     backdropFilter: "blur(8px)",
-                },
-            }}
-            variant="outlined"
-            sx={{ mb: 2 }}
-        />
+                }}
+            />
+        </FormControl>
     );
 }
+
+
+
 
 function CustomPasswordField() {
     const [showPassword, setShowPassword] = useState(false);
 
     return (
         <FormControl fullWidth variant="outlined" sx={{ my: 2 }}>
-            <InputLabel size="small">Contraseña</InputLabel>
+            <InputLabel htmlFor="password-input" size="small">Contraseña</InputLabel>
             <OutlinedInput
+                id="password-input"
                 type={showPassword ? "text" : "password"}
                 name="password"
                 size="small"
@@ -183,6 +188,18 @@ export default function Login() {
                         emailField: CustomEmailField,
                         passwordField: CustomPasswordField,
                         submitButton: CustomButton,
+                        signUpLink: () => null,
+                        forgotPasswordLink: () => null,
+                        subtitle: () => (
+                            <span style={{ color: "#666", fontSize: 14 }}>
+                                Ingresa tus credenciales para continuar
+                            </span>
+                        ),
+                        title: () => (
+                            <h2 style={{ margin: 0, fontWeight: 700 }}>
+                                Iniciar sesión
+                            </h2>
+                        ),
                     }}
                     slotProps={{ form: { noValidate: true } }}
                 />
