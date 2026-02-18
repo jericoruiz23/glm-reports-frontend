@@ -13,7 +13,7 @@ import UserIcon from "../../assets/user.svg";
 import toast from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
 
-export default function Sidebar({ isOpen, mobileOpen }) {
+export default function Sidebar({ isOpen, mobileOpen, onExpand }) {
     const { user, initializing, logout } = useAuth();
     const navigate = useNavigate();
 
@@ -46,7 +46,14 @@ export default function Sidebar({ isOpen, mobileOpen }) {
                         {/* DISPARADOR CON ESTILO DINÁMICO */}
                         <div
                             className="admin-link"
-                            onClick={() => setOpenProcesos(!openProcesos)}
+                            onClick={() => {
+                                if (!isOpen && onExpand) {
+                                    onExpand();
+                                    setOpenProcesos(true);
+                                } else {
+                                    setOpenProcesos(!openProcesos);
+                                }
+                            }}
                             style={{
                                 cursor: "pointer",
                                 background: (openProcesos || isProcesoActive) ? "rgba(0, 0, 0, 0.08)" : "transparent",
@@ -82,7 +89,7 @@ export default function Sidebar({ isOpen, mobileOpen }) {
                                 </NavLink>
                                 <NavLink to="/despacho">
                                     <img src={Dispatch} alt="Despacho" className="sidebar-icon" />
-                                    <span>Despachos</span>
+                                    <span>Despacho</span>
                                 </NavLink>
                             </div>
                         )}
