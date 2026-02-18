@@ -62,12 +62,7 @@ export default function ManagePostShippingCompact() {
                 .filter(
                     p =>
                         p.currentStage === "postembarque" &&
-                        p.postembarque &&
-                        Object.keys(p.postembarque).some(
-                            key =>
-                                p.postembarque[key] !== null &&
-                                p.postembarque[key] !== ""
-                        )
+                        p.postembarque
                 )
                 .map(p => ({
                     _id: p._id,
@@ -76,7 +71,6 @@ export default function ManagePostShippingCompact() {
                     codigoImportacion: p.inicio?.codigoImportacion || "-",
                     proveedor: p.inicio?.proveedor || "-"
                 }));
-            console.log("📦 dataRaw desde API:", dataRaw);
 
             const procesosDisponibles = dataRaw.filter(
                 p =>
@@ -89,7 +83,6 @@ export default function ManagePostShippingCompact() {
                     )
             )
 
-            console.log("🟢 procesosDisponibles (calculados):", procesosDisponibles);
 
             setPostembarques(postArray);
             setFiltered(postArray);
