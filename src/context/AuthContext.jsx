@@ -1,13 +1,10 @@
 // src/context/AuthContext.jsx
 import React, { createContext, useContext, useState, useEffect } from "react";
-import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import api from "../services/api";
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const navigate = useNavigate();
-
   const [user, setUser] = useState(null);
   const [mustChangePassword, setMustChangePassword] = useState(false);
   const [initializing, setInitializing] = useState(true);
@@ -15,19 +12,9 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const res = await fetch(
-          `${process.env.REACT_APP_API_URL}/api/auth/me`,
-          { method: "GET", credentials: "include" }
-        );
-
-        if (!res.ok) {
-          setUser(null);
-          setMustChangePassword(false);
-        } else {
-          const data = await res.json();
-          setUser(data.user);
-          setMustChangePassword(data.user?.passwordMustChange || false);
-        }
+        const data = await api.get("/api/auth/me");
+        setUser(data.user);
+        setMustChangePassword(data.user?.passwordMustChange || false);
       } catch {
         setUser(null);
         setMustChangePassword(false);
@@ -40,28 +27,12 @@ export function AuthProvider({ children }) {
   }, []);
 
   const passwordChanged = () => {
-    setUser(null);              // limpia sesión frontend
-    setMustChangePassword(false); // elimina el bloqueo
+    setUser(null);
+    setMustChangePassword(false);
   };
 
-
   const login = async (email, password) => {
-    const res = await fetch(
-      `${process.env.REACT_APP_API_URL}/api/auth/login`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ email, password }),
-      }
-    );
-
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.message || "Error al iniciar sesión");
-    }
-
-    const data = await res.json();
+    const data = await api.post("/api/auth/login", { email, password });
 
     setUser({
       ...data.user,
@@ -72,13 +43,9 @@ export function AuthProvider({ children }) {
     return data;
   };
 
-  // AuthContext.jsx
   const logout = async () => {
     try {
-      await fetch(`${process.env.REACT_APP_API_URL}/api/auth/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
+      await api.post("/api/auth/logout");
     } catch (err) {
       console.error("Logout error:", err);
     } finally {
@@ -86,7 +53,6 @@ export function AuthProvider({ children }) {
       setMustChangePassword(false);
     }
   };
-
 
   return (
     <AuthContext.Provider

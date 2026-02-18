@@ -6,7 +6,6 @@ import {
     OutlinedInput,
     TextField,
     InputAdornment,
-    Link,
     IconButton,
 } from "@mui/material";
 import AccountCircle from "@mui/icons-material/AccountCircle";
@@ -102,21 +101,6 @@ function CustomButton() {
     );
 }
 
-function SignUpLink() {
-    return (
-        <Link href="/" variant="body2">
-            Registrarse
-        </Link>
-    );
-}
-
-function ForgotPasswordLink() {
-    return (
-        <Link href="/" variant="body2">
-            ¿Olvidaste tu contraseña?
-        </Link>
-    );
-}
 
 /* ======================
    LOGIN PRINCIPAL
@@ -126,6 +110,7 @@ export default function Login() {
     const theme = useTheme();
     const navigate = useNavigate();
     const { login, user, initializing } = useAuth();
+    const [loading, setLoading] = useState(false);
 
     // 🔒 Si ya está logueado → dashboard
     useEffect(() => {
@@ -146,12 +131,16 @@ export default function Login() {
     };
 
     const handleSignIn = async (_provider, formData) => {
+        if (loading) return;
+        setLoading(true);
+
         try {
             const emailRaw = formData.get("email");
             const password = formData.get("password");
 
             if (!emailRaw || !password) {
                 toast.error("Completa todos los campos");
+                setLoading(false);
                 return;
             }
 
@@ -160,16 +149,17 @@ export default function Login() {
 
             const res = await login(email, password);
 
-            if (res.mustChangePassword) {
-                navigate("/change-password");
-                return;
+            // La navegación la maneja el useEffect al detectar user en el contexto
+            if (res.passwordMustChange) {
+                navigate("/change-password", { replace: true });
+            } else {
+                toast.success(`¡Bienvenido ${res.user.name}!`);
             }
-
-            toast.success(`¡Bienvenido ${res.user.name}!`);
-            navigate("/dashboard");
 
         } catch (err) {
             toast.error(err.message || "Credenciales incorrectas");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -193,8 +183,6 @@ export default function Login() {
                         emailField: CustomEmailField,
                         passwordField: CustomPasswordField,
                         submitButton: CustomButton,
-                        signUpLink: SignUpLink,
-                        // forgotPasswordLink: ForgotPasswordLink,
                     }}
                     slotProps={{ form: { noValidate: true } }}
                 />

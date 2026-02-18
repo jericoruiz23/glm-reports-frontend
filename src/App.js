@@ -26,7 +26,7 @@ export default function App() {
 
       {/* 🌐 Públicas */}
       <Route path="/login" element={<Login />} />
-      <Route path="/change-password" element={<ChangePassword />} />
+      <Route path="/change-password" element={<PrivateRoute><ChangePassword /></PrivateRoute>} />
 
       {/* 🔐 Privadas */}
       <Route
@@ -177,7 +177,7 @@ export default function App() {
         path="/tiempos"
         element={
           <PrivateRoute>
-            <ManageTimes/>
+            <ManageTimes />
           </PrivateRoute>
         }
       />

@@ -2,14 +2,15 @@ import React, { useState } from "react";
 import { Button, TextField, Box, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { useAuth } from "../context/AuthContext"; // ajusta la ruta si cambia
+import { useAuth } from "../context/AuthContext";
+import api from "../services/api";
 
 
 export default function ChangePassword() {
     const [newPassword, setPassword] = useState("");
     const [confirm, setConfirm] = useState("");
     const navigate = useNavigate();
-    const { logout, passwordChanged } = useAuth();
+    const { passwordChanged } = useAuth();
     const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e) => {
@@ -31,23 +32,9 @@ export default function ChangePassword() {
         setLoading(true);
 
         try {
-            const res = await fetch(
-                `${process.env.REACT_APP_API_URL}/api/auth/change-password`,
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    credentials: "include",
-                    body: JSON.stringify({ newPassword: newPassword.trim() }),
-                }
-            );
-
-            const body = await res.json();
-
-            if (!res.ok) {
-                toast.error(body.message || "Error al cambiar contraseña");
-                setLoading(false);
-                return;
-            }
+            await api.post("/api/auth/change-password", {
+                newPassword: newPassword.trim(),
+            });
 
             toast.success("Contraseña actualizada. Inicia sesión nuevamente");
 
@@ -56,7 +43,9 @@ export default function ChangePassword() {
 
         } catch (err) {
             console.error(err);
-            toast.error("Error al cambiar contraseña");
+            toast.error(err.message || "Error al cambiar contraseña");
+        } finally {
+            setLoading(false);
         }
 
     };
