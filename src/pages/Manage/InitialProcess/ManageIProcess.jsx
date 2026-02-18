@@ -105,11 +105,6 @@ export default function ManageInitialProcess() {
                         <Button variant="outlined" startIcon={<AddIcon />} onClick={() => setOpenCreate(true)}>
                             Crear Proceso
                         </Button>
-                        {/* <Button
-                            variant="outlined" startIcon={<AddIcon />} onClick={() => setOpenSubmit(true)}>
-                            Subir Procesos
-                        </Button> */}
-
                     </div>
                 </div>
 
