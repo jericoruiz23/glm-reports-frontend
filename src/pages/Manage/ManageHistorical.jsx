@@ -6,13 +6,11 @@ import toast from "react-hot-toast";
 import Layout from "../../components/Dashboard/Layout";
 import ModalViewBill from "../../components/Modals/Historical/ModalViewBill";
 import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
 import api from "../../services/api";
 
 export default function ManageBills() {
     const [bills, setBills] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [openCreate, setOpenCreate] = useState(false);
     const [openDrawer, setOpenDrawer] = useState(false);
     const [selectedBill, setSelectedBill] = useState(null);
     const [loadingDetails, setLoadingDetails] = useState(false);

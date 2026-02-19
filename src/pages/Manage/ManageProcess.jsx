@@ -6,7 +6,6 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import { Toaster } from "react-hot-toast";
 import toast from "react-hot-toast";
-import ModalGeneric from "../../components/Modals/ModalGeneric";
 import ModalEditUser from "../../components/Modals/ModalEditUser";
 import { useMediaQuery } from "@mui/material";
 import ModalProcesoDetalle from "../../components/Modals/ModalProcessDetail";

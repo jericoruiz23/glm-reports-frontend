@@ -23,7 +23,6 @@ export default function ModalViewCommerce({
     if (!selected) return null;
 
     const { registro, item } = selected;
-    const itemId = item?.id || item?._id;
 
     const fechaHeaders = [
         "FECHA SOLICITUD",
