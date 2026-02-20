@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Layout from "../components/Dashboard/Layout";
 import { useAuth } from "../context/AuthContext";
 import { LinearProgress } from "@mui/material";
@@ -18,8 +18,8 @@ import {
 export default function Dashboard() {
     const { user } = useAuth();
 
-    const [highPriorityCount, setHighPriorityCount] = useState(0);
-    const [loading, setLoading] = useState(true);
+    const [highPriorityCount] = useState(0);
+    const [loading] = useState(true);
 
     // Datos quemados para gráficos
     const trendData = [

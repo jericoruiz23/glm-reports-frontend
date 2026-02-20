@@ -2,20 +2,15 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Manage/Manage";
-import Reportes from "./pages/Reports";
 import ManageUsers from "./pages/Manage/ManageUsers";
-import ManageShipping from "./pages/Manage/ManagePreshiping";
+import ManageShipping from "./pages/Manage/ManagePreshipping";
 import PrivateRoute from "./routes/PrivateRoute";
-import ManageImports from "./pages/Manage/ManageImports";
-import ManageHistorical from "./pages/Manage/ManageHistorical";
-import ManageForms from "./pages/Manage/Forms/ManageForms";
 import ManageIProcess from "./pages/Manage/InitialProcess/ManageIProcess";
 import ManagePostShipping from "./pages/Manage/PostShipping/ManagePostShipping";
 import ManageCustoms from "./pages/Manage/Customs/ManageCustoms";
 import ManageDispatch from "./pages/Manage/Dispatch/ManageDispatch";
 import ManageControlImport from "./pages/Manage/ManageControlImport";
 import ManageCommerce from "./pages/Manage/Commerce/ManageCommerce";
-import ManageAutomatic from "./pages/Manage/Automatic/ManageAutomatic";
 import ManageReports from "./pages/Manage/Reports/ManageReports";
 import ChangePassword from "./pages/ChangePassword";
 import ManageCatalog from "./pages/Manage/Catalog/ManageCatalog";
@@ -41,7 +36,7 @@ export default function App() {
       <Route
         path="/admin"
         element={
-          <PrivateRoute>
+          <PrivateRoute allowedRoles={["admin"]}>
             <Admin />
           </PrivateRoute>
         }
@@ -50,46 +45,10 @@ export default function App() {
       </Route>
 
       <Route
-        path="/procesos"
-        element={
-          <PrivateRoute>
-            <Reportes />
-          </PrivateRoute>
-        }
-      />
-
-      <Route
         path="/preembarque"
         element={
-          <PrivateRoute>
+          <PrivateRoute allowedRoles={["admin"]}>
             <ManageShipping />
-          </PrivateRoute>
-        }
-      />
-
-      <Route
-        path="/importaciones"
-        element={
-          <PrivateRoute>
-            <ManageImports />
-          </PrivateRoute>
-        }
-      />
-
-      <Route
-        path="/historico"
-        element={
-          <PrivateRoute>
-            <ManageHistorical />
-          </PrivateRoute>
-        }
-      />
-
-      <Route
-        path="/gestion/facturas"
-        element={
-          <PrivateRoute>
-            <ManageForms />
           </PrivateRoute>
         }
       />
@@ -97,7 +56,7 @@ export default function App() {
       <Route
         path="/postembarque"
         element={
-          <PrivateRoute>
+          <PrivateRoute allowedRoles={["admin"]}>
             <ManagePostShipping />
           </PrivateRoute>
         }
@@ -106,7 +65,7 @@ export default function App() {
       <Route
         path="/aduana"
         element={
-          <PrivateRoute>
+          <PrivateRoute allowedRoles={["admin"]}>
             <ManageCustoms />
           </PrivateRoute>
         }
@@ -115,7 +74,7 @@ export default function App() {
       <Route
         path="/despacho"
         element={
-          <PrivateRoute>
+          <PrivateRoute allowedRoles={["admin"]}>
             <ManageDispatch />
           </PrivateRoute>
         }
@@ -124,7 +83,7 @@ export default function App() {
       <Route
         path="/inicioproceso"
         element={
-          <PrivateRoute>
+          <PrivateRoute allowedRoles={["admin"]}>
             <ManageIProcess />
           </PrivateRoute>
         }
@@ -149,15 +108,6 @@ export default function App() {
       />
 
       <Route
-        path="/automatico"
-        element={
-          <PrivateRoute>
-            <ManageAutomatic />
-          </PrivateRoute>
-        }
-      />
-
-      <Route
         path="/reportes"
         element={
           <PrivateRoute>
@@ -168,7 +118,7 @@ export default function App() {
       <Route
         path="/catalogos"
         element={
-          <PrivateRoute>
+          <PrivateRoute allowedRoles={["admin"]}>
             <ManageCatalog />
           </PrivateRoute>
         }

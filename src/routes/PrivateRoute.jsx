@@ -3,7 +3,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { CircularProgress, Box } from "@mui/material";
 
-export default function PrivateRoute({ children }) {
+export default function PrivateRoute({ children, allowedRoles }) {
     const { user, initializing } = useAuth();
     const location = useLocation();
 
@@ -33,5 +33,9 @@ export default function PrivateRoute({ children }) {
     }
 
     // ✅ Acceso permitido
+    if (allowedRoles?.length && !allowedRoles.includes(user.role)) {
+        return <Navigate to="/dashboard" replace />;
+    }
+
     return children;
 }

@@ -82,8 +82,7 @@ export default function ModalCreatePostshipment({
             fetchCatalogos();
             setForm(initialForm);
         }
-        console.log(procesos);
-    }, [open]);
+    }, [open, procesos]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;

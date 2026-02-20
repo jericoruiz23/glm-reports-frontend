@@ -98,10 +98,7 @@ export default function ModalCreateEtapa1({ open, onClose, onCreated }) {
         setCodigoEditable(nuevo);
     };
 
-    const getCodigoCompleto = () => {
-        if (!codigoBase) return "";
-        return codigoBase + extensiones.map(ext => `-${ext}`).join("");
-    };
+
 
     const handleChange = (e) => {
         setForm(prev => ({

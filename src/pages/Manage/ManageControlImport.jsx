@@ -1,5 +1,5 @@
 // src/pages/manage/ManageControlImport.jsx
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState } from "react";
 import Button from "@mui/material/Button";
 import toast from "react-hot-toast";
 import Layout from "../../components/Dashboard/Layout";
@@ -11,8 +11,7 @@ import { useAuth } from "../../context/AuthContext";
 
 
 
-// 🔹 IMPORT QUE FALTABA
-import { celdasExcel } from "../Manage/ControlImport/controlimportOptions"; // <-- AJUSTA RUTA SI ES NECESARIO
+import { celdasExcel } from "./ControlImport/controlImportOptions";
 
 export default function ManageControlImport() {
     const [preembarques, setPreembarques] = useState([]);

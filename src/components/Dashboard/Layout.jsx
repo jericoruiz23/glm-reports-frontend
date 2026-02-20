@@ -27,7 +27,7 @@ export default function Layout({ children }) {
                 } else {
                     setMobileOpen(false);
                 }
-            }, 10000); 
+            }, 10000);
         };
 
         // Inicia el timer al cargar
@@ -48,7 +48,17 @@ export default function Layout({ children }) {
     return (
         <div className="layout">
             <Header toggleSidebar={toggleSidebar} />
-            <Sidebar isOpen={isOpen} mobileOpen={mobileOpen} />
+            <Sidebar
+                isOpen={isOpen}
+                mobileOpen={mobileOpen}
+                onExpand={() => {
+                    if (window.innerWidth <= 768) {
+                        setMobileOpen(true);
+                    } else {
+                        setIsOpen(true);
+                    }
+                }}
+            />
             <main
                 className={`main ${isOpen ? "sidebar-open" : "sidebar-collapsed"} ${mobileOpen ? "mobile-open" : ""
                     }`}

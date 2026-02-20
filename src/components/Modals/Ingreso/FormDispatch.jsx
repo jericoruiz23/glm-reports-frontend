@@ -20,7 +20,7 @@ export default function FormDespacho({ data, onUpdated }) {
     });
 
     useEffect(() => {
-        if (data) setForm({ ...form, ...data });
+        if (data) setForm(prev => ({ ...prev, ...data }));
     }, [data]);
 
     const handleChange = (e) => {

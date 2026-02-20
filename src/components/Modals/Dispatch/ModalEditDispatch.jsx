@@ -7,8 +7,6 @@ import {
     TextField,
     Stack,
     Button,
-    Checkbox,
-    FormControlLabel,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import toast from "react-hot-toast";

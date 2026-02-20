@@ -8,9 +8,6 @@ import {
     Stack,
     Button,
     MenuItem,
-    Select,
-    InputLabel,
-    FormControl
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import toast from "react-hot-toast";
@@ -101,7 +98,7 @@ export default function ModalEditPostshipment({ open, onClose, procesos = [], da
             });
 
         }
-    }, [data]);
+    }, [data, open]);
 
 
     const getCatalogValue = (item) =>

@@ -11,7 +11,6 @@ import ModalGeneric from "../../components/Modals/ModalGeneric";
 import ModalEditUser from "../../components/Modals/ModalEditUser";
 
 export default function ManageUsers() {
-    const navigate = useNavigate();
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [openCreate, setOpenCreate] = useState(false);
