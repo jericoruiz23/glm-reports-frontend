@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import toast from "react-hot-toast";
-import { sections, labels, catalogFieldMap } from "../ControlImport/controlimportSections";
+import { sections, labels, catalogFieldMap } from "../ControlImport/controlImportSections";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";

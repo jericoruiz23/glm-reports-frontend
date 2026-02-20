@@ -9,7 +9,7 @@ import {
     Button,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { sections, labels } from "../ControlImport/controlimportSections";
+import { sections, labels } from "../ControlImport/controlImportSections";
 import toast from "react-hot-toast";
 import ModalEditControlImport from "./ModalEditControlImport";
 

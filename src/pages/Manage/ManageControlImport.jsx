@@ -11,8 +11,7 @@ import { useAuth } from "../../context/AuthContext";
 
 
 
-// 🔹 IMPORT QUE FALTABA
-import { celdasExcel } from "../Manage/ControlImport/controlimportOptions"; // <-- AJUSTA RUTA SI ES NECESARIO
+import { celdasExcel } from "./ControlImport/controlImportOptions";
 
 export default function ManageControlImport() {
     const [preembarques, setPreembarques] = useState([]);

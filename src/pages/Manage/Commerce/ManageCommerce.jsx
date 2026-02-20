@@ -8,7 +8,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import * as XLSX from 'xlsx-js-style';
 
-import { celdasExcel } from "../../Manage/Commerce/CommerceOptions.js"; // <-- AJUSTA RUTA SI ES NECESARIO
+import { celdasExcel } from "./CommerceOptions.js";
 
 export default function ManageCommerce() {
     const [preembarques, setPreembarques] = useState([]);

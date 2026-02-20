@@ -48,7 +48,17 @@ export default function Layout({ children }) {
     return (
         <div className="layout">
             <Header toggleSidebar={toggleSidebar} />
-            <Sidebar isOpen={isOpen} mobileOpen={mobileOpen} onExpand={() => setIsOpen(true)} />
+            <Sidebar
+                isOpen={isOpen}
+                mobileOpen={mobileOpen}
+                onExpand={() => {
+                    if (window.innerWidth <= 768) {
+                        setMobileOpen(true);
+                    } else {
+                        setIsOpen(true);
+                    }
+                }}
+            />
             <main
                 className={`main ${isOpen ? "sidebar-open" : "sidebar-collapsed"} ${mobileOpen ? "mobile-open" : ""
                     }`}
