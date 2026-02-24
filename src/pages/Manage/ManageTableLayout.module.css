@@ -1,0 +1,53 @@
+.pageTop {
+  padding-top: 1rem;
+}
+
+.headerBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding-right: 3rem;
+  padding-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.headerActions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.searchInput {
+  padding: 10px 14px;
+  width: 300px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.searchInputCompact {
+  width: 280px;
+}
+
+.loadingCenter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60vh;
+}
+
+.stageCell {
+  font-weight: 600;
+}
+
+.statusCell {
+  font-weight: 600;
+}
+
+.statusActive {
+  color: green;
+}
+
+.statusCancelled {
+  color: red;
+}

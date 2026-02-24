@@ -22,11 +22,13 @@ export default function ManageCommerce() {
         fontSize: "0.8rem",
         textTransform: "uppercase",
         letterSpacing: "0.04em",
+        whiteSpace: "nowrap",
     };
 
     const td = {
         padding: "8px 12px",
         fontSize: "0.9rem",
+        whiteSpace: "nowrap",
     };
 
 
@@ -205,9 +207,9 @@ export default function ManageCommerce() {
                             </div>
                         </div>
 
-                        <div style={{ overflow: "auto" }}>
-                            <div style={{ maxWidth: "1000px", marginBottom: "2rem" }}>
-                                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                        <div style={{ overflowX: "auto", width: "100%" }}>
+                            <div className="card" style={{ width: "max-content", minWidth: "100%", marginBottom: "2rem" }}>
+                                <table style={{ width: "max-content", minWidth: "100%", borderCollapse: "collapse" }}>
                                     <thead>
                                         <tr style={{ background: "rgba(255,255,255,0.1)", textAlign: "left" }}>
                                             {celdasExcel.map((col) => (

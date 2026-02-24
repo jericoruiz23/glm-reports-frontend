@@ -273,6 +273,20 @@ body,
     overflow-x: auto;
 }
 
+/* Hover consistente para filas en tablas fuera de ManageTable */
+.card table tbody tr {
+    transition: background-color 160ms ease, box-shadow 160ms ease;
+}
+
+.card table tbody tr:hover {
+    background-color: rgba(29, 78, 216, 0.12);
+}
+
+.card table tbody tr:focus-within {
+    background-color: rgba(29, 78, 216, 0.12);
+    box-shadow: inset 0 0 0 1px rgba(29, 78, 216, 0.35);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .sidebar {

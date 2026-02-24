@@ -25,8 +25,12 @@ async function request(endpoint, options = {}) {
     const res = await fetch(`${BASE}${endpoint}`, config);
 
     if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.message || `Error ${res.status}`);
+        const errData = await res.json().catch(() => ({}));
+        const error = new Error(errData.message || `Error ${res.status}`);
+        error.status = res.status;
+        error.data = errData;
+        error.endpoint = endpoint;
+        throw error;
     }
 
     // Algunas respuestas pueden no tener body (204 No Content)

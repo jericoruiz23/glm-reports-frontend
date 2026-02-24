@@ -1,0 +1,52 @@
+.wrapper {
+  width: 100%;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.headRow {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.th {
+  padding: 10px 12px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.td {
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.clickableRow {
+  cursor: pointer;
+}
+
+/* Resalta visualmente la fila activa al pasar el mouse. */
+.clickableRow:hover .td {
+  background-color: rgba(29, 78, 216, 0.12);
+}
+
+.emptyCell {
+  padding: 12px 15px;
+  text-align: center;
+}
+
+.alignLeft {
+  text-align: left;
+}
+
+.alignCenter {
+  text-align: center;
+}
+
+.alignRight {
+  text-align: right;
+}
