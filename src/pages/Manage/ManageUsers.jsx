@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import Delete from "../../assets/cross.svg";
 import Edit from "../../assets/edit.svg";
 import CreateUserIcon from "../../assets/create_user.svg";
@@ -9,38 +8,14 @@ import toast from "react-hot-toast";
 import CreateUserForm from "../../components/CreateUser/CreateUserForm";
 import ModalGeneric from "../../components/Modals/ModalGeneric";
 import ModalEditUser from "../../components/Modals/ModalEditUser";
+import useUsers from "../../hooks/useUsers";
+import usersService from "../../services/usersService";
 
 export default function ManageUsers() {
-    const [users, setUsers] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const { items: users, loading, refresh } = useUsers();
     const [openCreate, setOpenCreate] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
     const [openEdit, setOpenEdit] = useState(false);
-
-    // Función para cargar usuarios desde backend
-    const fetchUsers = async () => {
-        setLoading(true);
-        try {
-            const res = await fetch(`${process.env.REACT_APP_API_URL}/api/users`, {
-                method: "GET",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
-            });
-            if (!res.ok) throw new Error("Error al cargar usuarios");
-
-            const data = await res.json();
-            setUsers(Array.isArray(data) ? data : []);
-        } catch (err) {
-            console.error(err);
-            toast.error("No se pudieron cargar los usuarios");
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchUsers();
-    }, []);
 
     // Función para eliminar usuario
     const handleDelete = (id) => {
@@ -63,14 +38,9 @@ export default function ManageUsers() {
                     <button
                         onClick={async () => {
                             try {
-                                const res = await fetch(`${process.env.REACT_APP_API_URL}/api/users/${id}`, {
-                                    method: "DELETE",
-                                    headers: { "Content-Type": "application/json" },
-                                    credentials: "include",
-                                });
-                                if (!res.ok) throw new Error("Error al eliminar el usuario");
+                                await usersService.remove(id);
                                 toast.success("Usuario eliminado correctamente");
-                                fetchUsers(); // 🔄 recargar lista
+                                await refresh();
                             } catch (err) {
                                 console.error(err);
                                 toast.error("No se pudo eliminar el usuario");
@@ -112,7 +82,7 @@ export default function ManageUsers() {
     // Cuando se crea un usuario
     const handleUserCreated = async () => {
         setOpenCreate(false); // cerrar modal
-        await fetchUsers();   // recargar lista completa
+        await refresh();   // recargar lista completa
         toast.success("Usuario creado y lista actualizada!");
     };
 
@@ -231,25 +201,16 @@ export default function ManageUsers() {
                 open={openEdit}
                 onClose={() => setOpenEdit(false)}
                 user={selectedUser}
-                onSave={(updatedUser) => {
-                    setUsers(users.map(u => u._id === updatedUser._id ? updatedUser : u));
-                    setOpenEdit(false);
-
-                    fetch(`${process.env.REACT_APP_API_URL}/api/users/${updatedUser._id}`, {
-                        method: "PUT",
-                        headers: { "Content-Type": "application/json" },
-                        credentials: "include",
-                        body: JSON.stringify(updatedUser),
-                    })
-                        .then(res => {
-                            if (!res.ok) throw new Error("Error al actualizar usuario");
-                            return res.json();
-                        })
-                        .then(() => toast.success("Usuario actualizado correctamente"))
-                        .catch(err => {
-                            console.error(err);
-                            toast.error("Error al actualizar usuario en el servidor");
-                        });
+                onSave={async (updatedUser) => {
+                    try {
+                        await usersService.update(updatedUser._id, updatedUser);
+                        toast.success("Usuario actualizado correctamente");
+                        setOpenEdit(false);
+                        await refresh();
+                    } catch (err) {
+                        console.error(err);
+                        toast.error("Error al actualizar usuario en el servidor");
+                    }
                 }}
             />
         </div>

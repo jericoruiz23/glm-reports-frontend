@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import Layout from "../../../components/Dashboard/Layout";
 import { Box, Checkbox, Typography, Paper, Button } from "@mui/material";
+import toast from "react-hot-toast";
 import * as XLSX from "xlsx-js-style";
+import useProcesses from "../../../hooks/useProcesses";
 
 import { VariableCatalog } from "./VariableCatalog";
 
@@ -15,6 +17,7 @@ const AVAILABLE_FIELDS = Object.entries(VariableCatalog).flatMap(
 );
 
 export default function ReportFieldSelector({ data }) {
+    const { refresh } = useProcesses({ autoFetch: false, showErrorToast: false });
     const [selectedFields, setSelectedFields] = useState([]);
 
     const toggleField = (field) => {
@@ -33,13 +36,12 @@ export default function ReportFieldSelector({ data }) {
             // Si no tienes "data" pasada por props, fetch al backend:
             let reportData = data;
             if (!reportData) {
-                const res = await fetch(`${process.env.REACT_APP_API_URL}/api/process`, {
-                    method: "GET",
-                    credentials: "include",
-                    headers: { "Content-Type": "application/json" },
-                });
-                if (!res.ok) throw new Error("Error al cargar datos");
-                reportData = await res.json();
+                reportData = await refresh();
+            }
+
+            if (!Array.isArray(reportData) || reportData.length === 0) {
+                toast.error("No hay datos para exportar");
+                return;
             }
 
             // Convertir los objetos a rows de Excel según las variables seleccionadas
@@ -100,7 +102,7 @@ export default function ReportFieldSelector({ data }) {
             XLSX.writeFile(wb, "reporte_personalizado.xlsx");
         } catch (err) {
             console.error(err);
-            alert("Error generando Excel");
+            toast.error("Error generando Excel");
         }
     };
 
