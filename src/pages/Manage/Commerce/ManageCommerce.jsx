@@ -173,7 +173,19 @@ export default function ManageCommerce() {
 
     return (
         <Layout>
-            <div className="page" style={{ paddingTop: "1rem", paddingLeft: "20px", paddingRight: "20px" }}>
+            <div
+                className="page"
+                style={{
+                    paddingTop: "1rem",
+                    paddingLeft: "20px",
+                    paddingRight: "20px",
+                    overflowX: "hidden",
+                    width: "100%",
+                    maxWidth: "100%",
+                    minWidth: 0,
+                    boxSizing: "border-box",
+                }}
+            >
                 {loading ? (
                     <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "60vh" }}>
                         <CircularProgress />
@@ -187,29 +199,63 @@ export default function ManageCommerce() {
                             gap: "1rem",
                             paddingBottom: "1rem",
                             flexWrap: "wrap",
+                            width: "100%",
+                            maxWidth: "100%",
+                            boxSizing: "border-box",
                         }}>
-                            <h1>Procesos comerciales</h1>
-                            <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+                            <h1 style={{ margin: 0 }}>Procesos comerciales</h1>
+                            <div
+                                style={{
+                                    display: "flex",
+                                    gap: "0.75rem",
+                                    alignItems: "center",
+                                    flexWrap: "nowrap",
+                                    justifyContent: "flex-end",
+                                }}
+                            >
                                 <input
                                     placeholder="Buscar..."
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                     style={{
                                         padding: "10px 14px",
-                                        width: "280px",
+                                        width: "min(280px, 100%)",
                                         borderRadius: "8px",
                                         border: "1px solid #ccc",
                                     }}
                                 />
-                                <Button variant="outlined" onClick={exportToExcel}>
+                                <Button
+                                    variant="outlined"
+                                    onClick={exportToExcel}
+                                    sx={{ whiteSpace: "nowrap", minWidth: "fit-content", px: 2 }}
+                                >
                                     Exportar Excel
                                 </Button>
                             </div>
                         </div>
 
-                        <div style={{ overflowX: "auto", width: "100%" }}>
-                            <div className="card" style={{ width: "max-content", minWidth: "100%", marginBottom: "2rem" }}>
-                                <table style={{ width: "max-content", minWidth: "100%", borderCollapse: "collapse" }}>
+                        <div
+                            className="card"
+                            style={{
+                                width: "100%",
+                                marginBottom: "2rem",
+                                background: "rgba(255,255,255,0.92)",
+                                boxShadow: "0 2px 10px rgba(0,0,0,0.04)",
+                                maxWidth: "100%",
+                                minWidth: 0,
+                            }}
+                        >
+                            <div
+                                className="responsive-table-wrapper"
+                                style={{
+                                    width: "100%",
+                                    maxWidth: "100%",
+                                    minWidth: 0,
+                                    overflowX: "auto",
+                                    overflowY: "hidden",
+                                }}
+                            >
+                                <table style={{ width: "max-content", minWidth: "2200px", borderCollapse: "collapse" }}>
                                     <thead>
                                         <tr style={{ background: "rgba(255,255,255,0.1)", textAlign: "left" }}>
                                             {celdasExcel.map((col) => (
