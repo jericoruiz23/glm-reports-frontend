@@ -244,9 +244,11 @@ body,
 /* Main */
 .main {
     flex: 1;
+    min-width: 0;
     margin-left: 240px;
     padding: 30px 20px 20px 20px;
     min-height: calc(100vh - 60px);
+    overflow-x: hidden;
     transition: margin-left 0.3s;
 }
 
