@@ -7,6 +7,7 @@ import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
+import processService from "../../../services/processService";
 
 export default function ManageDispatch() {
     const [processes, setProcesses] = useState([]);
@@ -33,17 +34,16 @@ export default function ManageDispatch() {
         try {
             setLoading(true);
 
-            const res = await fetch(`${process.env.REACT_APP_API_URL}/api/process`, {
-                credentials: "include",
-            });
-
-            if (!res.ok) throw new Error("Error al cargar procesos");
-
-            const data = await res.json();
-            setProcesses(data);
+            const allProcesses = await processService.listAll();
+            setProcesses(allProcesses);
         } catch (err) {
             console.error(err);
-            toast.error("No se pudieron cargar los procesos");
+            if (err.status === 401) {
+                toast.error("Sesión expirada. Vuelve a iniciar sesión.");
+            } else {
+                toast.error("No se pudieron cargar los procesos");
+            }
+            setProcesses([]);
         } finally {
             setLoading(false);
         }

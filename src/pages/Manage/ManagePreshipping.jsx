@@ -22,19 +22,35 @@ export default function ManageShipping() {
   const [procesos, setProcesos] = useState([]);
 
   useEffect(() => {
-    // Deriva la vista solo con procesos en etapa preembarque y con datos cargados.
+    // Deriva la vista solo para etapa preembarque con datos cargados.
+    const hasPreembarqueData = (preembarque = {}) =>
+      Object.values(preembarque).some((value) => {
+        if (Array.isArray(value)) return value.length > 0;
+        return value !== null && value !== undefined && value !== "";
+      });
+
+    const allItems = Array.isArray(items) ? items : [];
+    const inPreembarqueStage = allItems.filter((p) => p.currentStage === "preembarque");
+    const withPreembarqueData = inPreembarqueStage.filter((p) => hasPreembarqueData(p.preembarque || {}));
+
+    console.log("[ManagePreshipping] total items:", allItems.length);
+    console.log("[ManagePreshipping] stage=preembarque:", inPreembarqueStage.length);
+    console.log("[ManagePreshipping] stage=preembarque con data:", withPreembarqueData.length);
+    console.log(
+      "[ManagePreshipping] muestra stages:",
+      allItems.slice(0, 10).map((p) => ({ id: p._id, stage: p.currentStage, codigo: p.inicio?.codigoImportacion || p.codigoImportacion }))
+    );
+
     const preembarquesArray = Array.isArray(items)
       ? items
-          .filter(
-            (p) =>
-              p.currentStage === "preembarque" &&
-              Object.keys(p.preembarque || {}).some((key) => p.preembarque[key] !== null && p.preembarque[key] !== "")
-          )
-          .map((p) => ({
-            _id: p._id,
-            codigoImportacion: p.inicio?.codigoImportacion || "-",
-            ...p.preembarque,
-          }))
+        .filter(
+          (p) => p.currentStage === "preembarque" && hasPreembarqueData(p.preembarque || {})
+        )
+        .map((p) => ({
+          _id: p._id,
+          codigoImportacion: p.inicio?.codigoImportacion || p.codigoImportacion || "-",
+          ...p.preembarque,
+        }))
       : [];
 
     setPreembarques(preembarquesArray);

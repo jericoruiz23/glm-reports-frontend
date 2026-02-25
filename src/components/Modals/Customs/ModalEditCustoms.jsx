@@ -104,23 +104,21 @@ export default function ModalEditCustoms({ open, onClose, data, onUpdated }) {
     const handleSave = async () => {
         try {
             const payload = {
-                aduana: {
-                    ...form,
-                    fechaEnvioElectronico: form.fechaEnvioElectronico
-                        ? form.fechaEnvioElectronico.toISOString()
-                        : null,
-                    fechaPagoLiquidacion: form.fechaPagoLiquidacion
-                        ? form.fechaPagoLiquidacion.toISOString()
-                        : null,
-                    fechaSalidaAutorizada: form.fechaSalidaAutorizada
-                        ? form.fechaSalidaAutorizada.toISOString()
-                        : null,
-                }
+                ...form,
+                fechaEnvioElectronico: form.fechaEnvioElectronico
+                    ? form.fechaEnvioElectronico.toISOString()
+                    : null,
+                fechaPagoLiquidacion: form.fechaPagoLiquidacion
+                    ? form.fechaPagoLiquidacion.toISOString()
+                    : null,
+                fechaSalidaAutorizada: form.fechaSalidaAutorizada
+                    ? form.fechaSalidaAutorizada.toISOString()
+                    : null,
             };
             const res = await fetch(
-                `${process.env.REACT_APP_API_URL}/api/process/${data._id}`,
+                `${process.env.REACT_APP_API_URL}/api/process/${data._id}/aduana`,
                 {
-                    method: "PUT",
+                    method: "PATCH",
                     credentials: "include",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload),

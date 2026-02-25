@@ -7,6 +7,7 @@ import ModalViewCommerce from "../../../components/Modals/Commerce/ModalViewComm
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import * as XLSX from 'xlsx-js-style';
+import processService from "../../../services/processService";
 
 import { celdasExcel } from "./CommerceOptions.js";
 
@@ -35,19 +36,16 @@ export default function ManageCommerce() {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`${process.env.REACT_APP_API_URL}/api/process`, {
-                method: "GET",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
-            });
-
-            if (!res.ok) throw new Error("Error al cargar procesos");
-
-            const data = await res.json();
-            setPreembarques(Array.isArray(data) ? data : []);
+            const allProcesses = await processService.listAll();
+            setPreembarques(allProcesses);
         } catch (err) {
             console.error(err);
-            toast.error("No se pudieron cargar los registros");
+            if (err.status === 401) {
+                toast.error("Sesión expirada. Vuelve a iniciar sesión.");
+            } else {
+                toast.error("No se pudieron cargar los registros");
+            }
+            setPreembarques([]);
         } finally {
             setLoading(false);
         }
@@ -246,15 +244,24 @@ export default function ManageCommerce() {
                             }}
                         >
                             <div
-                                className="responsive-table-wrapper"
+                                className="responsive-table-wrapper no-scrollbar-commerce"
                                 style={{
                                     width: "100%",
                                     maxWidth: "100%",
                                     minWidth: 0,
                                     overflowX: "auto",
                                     overflowY: "hidden",
+                                    scrollbarWidth: "none",
+                                    msOverflowStyle: "none",
                                 }}
                             >
+                                <style>
+                                    {`
+                                      .no-scrollbar-commerce::-webkit-scrollbar {
+                                        display: none;
+                                      }
+                                    `}
+                                </style>
                                 <table style={{ width: "max-content", minWidth: "2200px", borderCollapse: "collapse" }}>
                                     <thead>
                                         <tr style={{ background: "rgba(255,255,255,0.1)", textAlign: "left" }}>

@@ -7,6 +7,7 @@ import ModalCreateCustoms from "../../../components/Modals/Customs/ModalCreateCu
 import ModalEditCustoms from "../../../components/Modals/Customs/ModalEditCustoms";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
+import processService from "../../../services/processService";
 
 export default function ManageCustoms() {
     const [processes, setProcesses] = useState([]);
@@ -34,18 +35,15 @@ export default function ManageCustoms() {
         try {
             setLoading(true);
 
-            const res = await fetch(`${process.env.REACT_APP_API_URL}/api/process`, {
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
-            });
-
-            if (!res.ok) throw new Error("Error al cargar registros");
-
-            const data = await res.json();
-            setProcesses(Array.isArray(data) ? data : data.data ?? []);
+            const allProcesses = await processService.listAll();
+            setProcesses(allProcesses);
         } catch (err) {
             console.error(err);
-            toast.error("No se pudieron cargar los registros");
+            if (err.status === 401) {
+                toast.error("Sesión expirada. Vuelve a iniciar sesión.");
+            } else {
+                toast.error("No se pudieron cargar los registros");
+            }
             setProcesses([]);
         } finally {
             setLoading(false);
@@ -55,15 +53,7 @@ export default function ManageCustoms() {
     const fetchById = async (id) => {
         try {
             setLoadingDetails(true);
-
-            const res = await fetch(`${process.env.REACT_APP_API_URL}/api/process/${id}`, {
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
-            });
-
-            if (!res.ok) throw new Error("Error al cargar detalle");
-
-            const data = await res.json();
+            const data = await processService.getById(id);
             setSelectedProcess(data);
             setOpenEdit(true);
         } catch (err) {

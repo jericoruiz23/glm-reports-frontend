@@ -7,6 +7,7 @@ import Button from "@mui/material/Button";
 import AddIcon from "@mui/icons-material/Add";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
+import processService from "../../../services/processService";
 
 export default function ManagePostShippingCompact() {
     const [postembarques, setPostembarques] = useState([]);
@@ -35,30 +36,12 @@ export default function ManagePostShippingCompact() {
         try {
             setLoading(true);
 
-            const res = await fetch(
-                `${process.env.REACT_APP_API_URL}/api/process`,
-                {
-                    method: "GET",
-                    credentials: "include",
-                    headers: { "Content-Type": "application/json" },
-                }
-            );
-
-            if (!res.ok) throw new Error("Error al cargar procesos");
-
-            const dataRaw = await res.json();
-
-            if (!Array.isArray(dataRaw)) {
-                setPostembarques([]);
-                setFiltered([]);
-                setDisponiblesPostembarque([]);
-                return;
-            }
+            const allProcesses = await processService.listAll();
 
             /* =========================
                POSTEMBARQUES (TABLA)
             ========================= */
-            const postArray = dataRaw
+            const postArray = allProcesses
                 .filter(
                     p =>
                         p.currentStage === "postembarque" &&
@@ -72,7 +55,7 @@ export default function ManagePostShippingCompact() {
                     proveedor: p.inicio?.proveedor || "-"
                 }));
 
-            const procesosDisponibles = dataRaw.filter(
+            const procesosDisponibles = allProcesses.filter(
                 p =>
                     p.currentStage === "preembarque" &&
                     p.preembarque &&
@@ -81,15 +64,18 @@ export default function ManagePostShippingCompact() {
                             p.preembarque[key] !== null &&
                             p.preembarque[key] !== ""
                     )
-            )
-
+            );
 
             setPostembarques(postArray);
             setFiltered(postArray);
             setDisponiblesPostembarque(procesosDisponibles);
         } catch (err) {
             console.error(err);
-            toast.error("No se pudieron cargar los registros");
+            if (err.status === 401) {
+                toast.error("Sesión expirada. Vuelve a iniciar sesión.");
+            } else {
+                toast.error("No se pudieron cargar los registros");
+            }
             setPostembarques([]);
             setFiltered([]);
             setDisponiblesPostembarque([]);
@@ -97,6 +83,7 @@ export default function ManagePostShippingCompact() {
             setLoading(false);
         }
     };
+
 
     useEffect(() => {
         fetchData();
