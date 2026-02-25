@@ -68,7 +68,8 @@ export default function ModalEditPreshipment({
 
     const formatDate = (date) => {
         if (!date) return "";
-        return dayjs(date).format("DD/MM/YYYY");
+        const parsed = dayjs(date);
+        return parsed.isValid() ? parsed.format("YYYY-MM-DD") : "";
     };
 
 
@@ -101,21 +102,23 @@ export default function ModalEditPreshipment({
 
     useEffect(() => {
         if (open && data) {
+            const preembarqueData = data?.preembarque ?? data;
             setForm({
                 ...emptyForm,
-                ...data,
-                fechaFactura: formatDate(data.fechaFactura),
-                fechaSolicitudRegimen: formatDate(data.fechaSolicitudRegimen),
-                fechaSolicitudGarantia: formatDate(data.fechaSolicitudGarantia),
-                fechaInicioGarantia: formatDate(data.fechaInicioGarantia),
-                fechaFinGarantia: formatDate(data.fechaFinGarantia),
-                fechaEnvioPoliza: formatDate(data.fechaEnvioPoliza),
-                fechaRecepcionDocumentoOriginal: formatDate(data.fechaRecepcionDocumentoOriginal),
-                fechaRecolectEstimada: formatDate(data.fechaRecolectEstimada),
-                fechaRecolectProveedor: formatDate(data.fechaRecolectProveedor),
-                fechaRecolectReal: formatDate(data.fechaRecolectReal),
-                fechaReqBodega: formatDate(data.fechaReqBodega),
-                fechaMaxReqBodega: formatDate(data.fechaMaxReqBodega),
+                ...preembarqueData,
+                _id: data?._id || preembarqueData?._id || "",
+                fechaFactura: formatDate(preembarqueData.fechaFactura),
+                fechaSolicitudRegimen: formatDate(preembarqueData.fechaSolicitudRegimen),
+                fechaSolicitudGarantia: formatDate(preembarqueData.fechaSolicitudGarantia),
+                fechaInicioGarantia: formatDate(preembarqueData.fechaInicioGarantia),
+                fechaFinGarantia: formatDate(preembarqueData.fechaFinGarantia),
+                fechaEnvioPoliza: formatDate(preembarqueData.fechaEnvioPoliza),
+                fechaRecepcionDocumentoOriginal: formatDate(preembarqueData.fechaRecepcionDocumentoOriginal),
+                fechaRecolectEstimada: formatDate(preembarqueData.fechaRecolectEstimada),
+                fechaRecolectProveedor: formatDate(preembarqueData.fechaRecolectProveedor),
+                fechaRecolectReal: formatDate(preembarqueData.fechaRecolectReal),
+                fechaReqBodega: formatDate(preembarqueData.fechaReqBodega),
+                fechaMaxReqBodega: formatDate(preembarqueData.fechaMaxReqBodega),
             });
         }
     }, [open, data]);
@@ -169,8 +172,7 @@ export default function ModalEditPreshipment({
                 delete stageFields._id;
             }
 
-            const payload = { [stage]: stageFields };
-            const updated = await api.put(`/api/process/${form._id}`, payload);
+            const updated = await api.patch(`/api/process/${form._id}/${stage}`, stageFields);
             toast.success("Pre-embarque actualizado");
             onUpdated?.(updated);
             onClose();

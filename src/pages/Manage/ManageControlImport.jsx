@@ -156,7 +156,7 @@ export default function ManageControlImport() {
 
   return (
     <Layout>
-      <div className={`page ${styles.pageTop}`}>
+      <div className={`page ${styles.pageTop} ${styles.controlImportSurface}`}>
         {loading ? (
           <Box className={styles.loadingCenter}>
             <CircularProgress />

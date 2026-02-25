@@ -123,30 +123,27 @@ export default function ModalEditPostshipment({ open, onClose, procesos = [], da
             const { codigoImportacionId, ...postembarqueData } = form;
 
             const payload = {
-                postembarque: {
-                    blMaster: postembarqueData.blMaster,
-                    blHijo: postembarqueData.blHijo,
-                    tipoTransporte: postembarqueData.tipoTransporte,
-                    companiaTransporte: postembarqueData.companiaTransporte,
-                    forwarder: postembarqueData.forwarder,
-                    numeroGuia: postembarqueData.numeroGuia,
-                    puertoEmbarque: postembarqueData.puertoEmbarque,
-
-                    fechaEstEmbarque: postembarqueData.fechaEstEmbarque?.toISOString() || null,
-                    fechaRealEmbarque: postembarqueData.fechaRealEmbarque?.toISOString() || null,
-                    fechaEstLlegadaPuerto: postembarqueData.fechaEstLlegadaPuerto?.toISOString() || null,
-                    fechaRealLlegadaPuerto: postembarqueData.fechaRealLlegadaPuerto?.toISOString() || null,
-                    fechaRecepcionDocsOriginales:
-                        postembarqueData.fechaRecepcionDocsOriginales?.toISOString() || null,
-                }
+                blMaster: postembarqueData.blMaster,
+                blHijo: postembarqueData.blHijo,
+                tipoTransporte: postembarqueData.tipoTransporte,
+                companiaTransporte: postembarqueData.companiaTransporte,
+                forwarder: postembarqueData.forwarder,
+                numeroGuia: postembarqueData.numeroGuia,
+                puertoEmbarque: postembarqueData.puertoEmbarque,
+                fechaEstEmbarque: postembarqueData.fechaEstEmbarque?.toISOString() || null,
+                fechaRealEmbarque: postembarqueData.fechaRealEmbarque?.toISOString() || null,
+                fechaEstLlegadaPuerto: postembarqueData.fechaEstLlegadaPuerto?.toISOString() || null,
+                fechaRealLlegadaPuerto: postembarqueData.fechaRealLlegadaPuerto?.toISOString() || null,
+                fechaRecepcionDocsOriginales:
+                    postembarqueData.fechaRecepcionDocsOriginales?.toISOString() || null,
             };
 
             console.log("🟡 Payload FINAL:", payload);
 
             const res = await fetch(
-                `${process.env.REACT_APP_API_URL}/api/process/${data._id}`,
+                `${process.env.REACT_APP_API_URL}/api/process/${data._id}/postembarque`,
                 {
-                    method: "PUT",
+                    method: "PATCH",
                     credentials: "include",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload),

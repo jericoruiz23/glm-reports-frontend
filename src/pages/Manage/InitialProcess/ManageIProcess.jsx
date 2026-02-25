@@ -8,6 +8,7 @@ import ModalViewProcess from "../../../components/Modals/InitialProcess/ModalEdi
 import ModalSubmitData from "../../../components/Modals/SubmitData/ModalSubmitData";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
+import processService from "../../../services/processService";
 
 export default function ManageInitialProcess() {
     const [procesos, setProcesos] = useState([]);
@@ -36,31 +37,21 @@ export default function ManageInitialProcess() {
         try {
             setLoading(true);
 
-            const res = await fetch(`${process.env.REACT_APP_API_URL}/api/process`, {
-                method: "GET",
-                credentials: "include",
-                headers: { "Content-Type": "application/json" },
-            });
-
-            if (res.status === 401) {
-                toast.error("Sesión expirada. Vuelve a iniciar sesión.");
-                setProcesos([]);
-                return;
-            }
-
-            if (!res.ok) throw new Error("Error al obtener procesos");
-            const dataRaw = await res.json();
-            const procesosArray = Array.isArray(dataRaw) ? dataRaw : dataRaw.data;
-
-            setProcesos(procesosArray || []);
+            const procesosArray = await processService.listAll();
+            setProcesos(procesosArray);
         } catch (err) {
             console.error(err);
-            toast.error("No se pudieron cargar los registros");
+            if (err.status === 401) {
+                toast.error("Sesión expirada. Vuelve a iniciar sesión.");
+            } else {
+                toast.error("No se pudieron cargar los registros");
+            }
             setProcesos([]);
         } finally {
             setLoading(false);
         }
     };
+
 
 
     useEffect(() => {
