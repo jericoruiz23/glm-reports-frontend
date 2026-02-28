@@ -9,6 +9,8 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import processService from "../../../services/processService";
 
+import { getStageCandidates } from "../../../utils/stageCreateHelpers";
+
 export default function ManagePostShippingCompact() {
     const [postembarques, setPostembarques] = useState([]);
     const [filtered, setFiltered] = useState([]);
@@ -55,15 +57,10 @@ export default function ManagePostShippingCompact() {
                     proveedor: p.inicio?.proveedor || "-"
                 }));
 
-            const procesosDisponibles = allProcesses.filter(
-                p =>
-                    p.currentStage === "preembarque" &&
-                    p.preembarque &&
-                    Object.keys(p.preembarque).some(
-                        key =>
-                            p.preembarque[key] !== null &&
-                            p.preembarque[key] !== ""
-                    )
+            const procesosDisponibles = getStageCandidates(
+                allProcesses,
+                "preembarque",
+                "postembarque"
             );
 
             setPostembarques(postArray);

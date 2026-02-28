@@ -9,6 +9,8 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import processService from "../../../services/processService";
 
+import { getStageCandidates } from "../../../utils/stageCreateHelpers";
+
 export default function ManageDispatch() {
     const [processes, setProcesses] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -79,7 +81,7 @@ export default function ManageDispatch() {
             );
         });
 
-    const readyForDispatch = processes.filter((p) => p.currentStage === "aduana");
+    const readyForDispatch = getStageCandidates(processes, "aduana", "despacho");
 
     return (
         <Layout>

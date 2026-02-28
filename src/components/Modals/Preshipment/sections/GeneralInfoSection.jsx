@@ -3,6 +3,8 @@ import { Box, Button, MenuItem, Stack, TextField } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 
+import { buildProcessCodeLabel, getStageCandidates } from "../../../../utils/stageCreateHelpers";
+
 export default function GeneralInfoSection({
   form,
   setForm,
@@ -23,9 +25,9 @@ export default function GeneralInfoSection({
           fullWidth
         >
           <option value="">Seleccionar Proceso</option>
-          {procesos.filter((p) => p.currentStage === "inicio").map((p) => (
+          {getStageCandidates(procesos, "inicio", "preembarque").map((p) => (
             <option key={p._id} value={p._id}>
-              {p.inicio?.codigoImportacion || "Sin codigo"}
+              {buildProcessCodeLabel(p) || "Sin codigo"}
             </option>
           ))}
         </TextField>

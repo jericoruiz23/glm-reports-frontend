@@ -27,7 +27,7 @@ export default function ModalCreatePreshipment({ open, onClose, onCreated, proce
     cancelEditItem,
     handleSubmit,
     fileInputRef,
-  } = usePreshipmentForm({ open, onClose, onCreated });
+  } = usePreshipmentForm({ open, onClose, onCreated, procesos });
 
   return (
     <Drawer

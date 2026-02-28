@@ -19,6 +19,13 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { es } from "date-fns/locale";
 
+import {
+    buildProcessCodeLabel,
+    getStageCandidates,
+    mergeTextValue,
+    toDateObject,
+} from "../../../utils/stageCreateHelpers";
+
 const initialForm = {
     codigoImportacion: "",
     blMaster: "",
@@ -54,6 +61,27 @@ export default function ModalCreatePostshipment({
         PAIS_ORIGEN: [],
         UNIDADES_METRICAS: []
     });
+    const eligibleProcesses = getStageCandidates(procesos, "preembarque", "postembarque");
+    const buildFormFromProcess = (processId, process) => {
+        const postembarque = process?.postembarque || {};
+
+        return {
+            ...initialForm,
+            codigoImportacion: processId || "",
+            blMaster: postembarque.blMaster || "",
+            blHijo: postembarque.blHijo || "",
+            tipoTransporte: postembarque.tipoTransporte || "",
+            companiaTransporte: postembarque.companiaTransporte || "",
+            forwarder: postembarque.forwarder || "",
+            fechaEstEmbarque: toDateObject(postembarque.fechaEstEmbarque),
+            fechaRealEmbarque: toDateObject(postembarque.fechaRealEmbarque),
+            fechaEstLlegadaPuerto: toDateObject(postembarque.fechaEstLlegadaPuerto),
+            fechaRealLlegadaPuerto: toDateObject(postembarque.fechaRealLlegadaPuerto),
+            numeroGuia: postembarque.numeroGuia || "",
+            fechaRecepcionDocsOriginales: toDateObject(postembarque.fechaRecepcionDocsOriginales),
+            puertoEmbarque: postembarque.puertoEmbarque || ""
+        };
+    };
 
     const fetchCatalogos = async () => {
         try {
@@ -82,10 +110,17 @@ export default function ModalCreatePostshipment({
             fetchCatalogos();
             setForm(initialForm);
         }
-    }, [open, procesos]);
+    }, [open]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+
+        if (name === "codigoImportacion") {
+            const selectedProcess = eligibleProcesses.find((process) => process?._id === value);
+            setForm(buildFormFromProcess(value, selectedProcess));
+            return;
+        }
+
         setForm((prev) => ({ ...prev, [name]: value }));
     };
 
@@ -103,15 +138,40 @@ export default function ModalCreatePostshipment({
 
         try {
             const { codigoImportacion, ...data } = form;
+            const selectedProcess = eligibleProcesses.find((process) => process?._id === codigoImportacion);
+            const existingPostembarque = selectedProcess?.postembarque || {};
 
             const payload = {
-                ...data,
-                fechaEstEmbarque: data.fechaEstEmbarque?.toISOString() || null,
-                fechaRealEmbarque: data.fechaRealEmbarque?.toISOString() || null,
-                fechaEstLlegadaPuerto: data.fechaEstLlegadaPuerto?.toISOString() || null,
-                fechaRealLlegadaPuerto: data.fechaRealLlegadaPuerto?.toISOString() || null,
+                blMaster: mergeTextValue(data.blMaster, existingPostembarque.blMaster),
+                blHijo: mergeTextValue(data.blHijo, existingPostembarque.blHijo),
+                tipoTransporte: mergeTextValue(data.tipoTransporte, existingPostembarque.tipoTransporte),
+                companiaTransporte: mergeTextValue(
+                    data.companiaTransporte,
+                    existingPostembarque.companiaTransporte
+                ),
+                forwarder: mergeTextValue(data.forwarder, existingPostembarque.forwarder),
+                fechaEstEmbarque:
+                    data.fechaEstEmbarque?.toISOString() ||
+                    existingPostembarque.fechaEstEmbarque ||
+                    null,
+                fechaRealEmbarque:
+                    data.fechaRealEmbarque?.toISOString() ||
+                    existingPostembarque.fechaRealEmbarque ||
+                    null,
+                fechaEstLlegadaPuerto:
+                    data.fechaEstLlegadaPuerto?.toISOString() ||
+                    existingPostembarque.fechaEstLlegadaPuerto ||
+                    null,
+                fechaRealLlegadaPuerto:
+                    data.fechaRealLlegadaPuerto?.toISOString() ||
+                    existingPostembarque.fechaRealLlegadaPuerto ||
+                    null,
+                numeroGuia: mergeTextValue(data.numeroGuia, existingPostembarque.numeroGuia),
                 fechaRecepcionDocsOriginales:
-                    data.fechaRecepcionDocsOriginales?.toISOString() || null
+                    data.fechaRecepcionDocsOriginales?.toISOString() ||
+                    existingPostembarque.fechaRecepcionDocsOriginales ||
+                    null,
+                puertoEmbarque: mergeTextValue(data.puertoEmbarque, existingPostembarque.puertoEmbarque)
             };
 
             const url = `${process.env.REACT_APP_API_URL}/api/process/${codigoImportacion}/postembarque`;
@@ -179,9 +239,9 @@ export default function ModalCreatePostshipment({
                             value={form.codigoImportacion}
                             onChange={handleChange}
                         >
-                            {(procesos || []).map(p => (
+                            {eligibleProcesses.map(p => (
                                 <MenuItem key={p._id} value={p._id}>
-                                    {p.codigoImportacion}
+                                    {buildProcessCodeLabel(p)}
                                 </MenuItem>
                             ))}
                         </Select>

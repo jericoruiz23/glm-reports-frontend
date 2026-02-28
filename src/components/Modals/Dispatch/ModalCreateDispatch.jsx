@@ -21,6 +21,14 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { es } from "date-fns/locale";
 
+import {
+    buildProcessCodeLabel,
+    getStageCandidates,
+    mergeNumberValue,
+    mergeTextValue,
+    toDateObject,
+} from "../../../utils/stageCreateHelpers";
+
 
 const initialForm = {
     processId: "",
@@ -57,6 +65,32 @@ export default function ModalCreateDispatch({
     processes = [],
 }) {
     const [form, setForm] = useState(initialForm);
+    const eligibleProcesses = getStageCandidates(processes, "aduana", "despacho");
+    const buildFormFromProcess = (processId, process) => {
+        const despacho = process?.despacho || {};
+
+        return {
+            ...initialForm,
+            processId: processId || "",
+            fechaFacturacionCostos: toDateObject(despacho.fechaFacturacionCostos),
+            numeroContainer: despacho.numeroContainer || "",
+            peso: despacho.peso ?? "",
+            bultos: despacho.bultos ?? "",
+            tipoContenedor: despacho.tipoContenedor || "",
+            fechaEstDespachoPuerto: toDateObject(despacho.fechaEstDespachoPuerto),
+            fechaRealDespachoPuerto: toDateObject(despacho.fechaRealDespachoPuerto),
+            fechaEstEntregaBodega: toDateObject(despacho.fechaEstEntregaBodega),
+            fechaRealEntregaBodega: toDateObject(despacho.fechaRealEntregaBodega),
+            diasLibres: despacho.diasLibres ?? "",
+            confirmadoNaviera: despacho.confirmadoNaviera ?? "",
+            fechaCas: toDateObject(despacho.fechaCas),
+            fechaEntregaContenedorVacio: toDateObject(despacho.fechaEntregaContenedorVacio),
+            almacenaje: despacho.almacenaje ?? "",
+            demorraje: despacho.demorraje ?? "",
+            observaciones: despacho.observaciones || "",
+            fechaRegistroPesos: toDateObject(despacho.fechaRegistroPesos),
+        };
+    };
 
     const handleDateChange = (name, value) => {
         setForm((prev) => ({
@@ -71,15 +105,18 @@ export default function ModalCreateDispatch({
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
+
+        if (name === "processId") {
+            const selectedProcess = eligibleProcesses.find((process) => process?._id === value);
+            setForm(buildFormFromProcess(value, selectedProcess));
+            return;
+        }
+
         setForm((prev) => ({
             ...prev,
             [name]: type === "checkbox" ? checked : value,
         }));
     };
-
-    const procesosDespacho = processes.filter(
-        (p) => p.currentStage === "aduana"
-    );
     const toISOorNull = (value) =>
         value ? new Date(value).toISOString() : null;
 
@@ -92,27 +129,51 @@ export default function ModalCreateDispatch({
 
         try {
             const { processId, ...d } = form;
+            const selectedProcess = eligibleProcesses.find((process) => process?._id === processId);
+            const existingDespacho = selectedProcess?.despacho || {};
 
             const payload = {
-                numeroContainer: d.numeroContainer,
-                tipoContenedor: d.tipoContenedor,
-                observaciones: d.observaciones,
-
-                peso: Number(d.peso || 0),
-                bultos: Number(d.bultos || 0),
-                diasLibres: Number(d.diasLibres || 0),
-                almacenaje: Number(d.almacenaje || 0),
-                demorraje: Number(d.demorraje || 0),
-                confirmadoNaviera: Number(d.confirmadoNaviera || 0),
-
-                fechaFacturacionCostos: toISOorNull(d.fechaFacturacionCostos),
-                fechaEstDespachoPuerto: toISOorNull(d.fechaEstDespachoPuerto),
-                fechaRealDespachoPuerto: toISOorNull(d.fechaRealDespachoPuerto),
-                fechaEstEntregaBodega: toISOorNull(d.fechaEstEntregaBodega),
-                fechaRealEntregaBodega: toISOorNull(d.fechaRealEntregaBodega),
-                fechaCas: toISOorNull(d.fechaCas),
-                fechaEntregaContenedorVacio: toISOorNull(d.fechaEntregaContenedorVacio),
-                fechaRegistroPesos: toISOorNull(d.fechaRegistroPesos),
+                numeroContainer: mergeTextValue(d.numeroContainer, existingDespacho.numeroContainer),
+                tipoContenedor: mergeTextValue(d.tipoContenedor, existingDespacho.tipoContenedor),
+                observaciones: mergeTextValue(d.observaciones, existingDespacho.observaciones),
+                peso: mergeNumberValue(d.peso, existingDespacho.peso),
+                bultos: mergeNumberValue(d.bultos, existingDespacho.bultos),
+                diasLibres: mergeNumberValue(d.diasLibres, existingDespacho.diasLibres),
+                almacenaje: mergeNumberValue(d.almacenaje, existingDespacho.almacenaje),
+                demorraje: mergeNumberValue(d.demorraje, existingDespacho.demorraje),
+                confirmadoNaviera: mergeNumberValue(
+                    d.confirmadoNaviera,
+                    existingDespacho.confirmadoNaviera
+                ),
+                fechaFacturacionCostos:
+                    toISOorNull(d.fechaFacturacionCostos) ||
+                    existingDespacho.fechaFacturacionCostos ||
+                    null,
+                fechaEstDespachoPuerto:
+                    toISOorNull(d.fechaEstDespachoPuerto) ||
+                    existingDespacho.fechaEstDespachoPuerto ||
+                    null,
+                fechaRealDespachoPuerto:
+                    toISOorNull(d.fechaRealDespachoPuerto) ||
+                    existingDespacho.fechaRealDespachoPuerto ||
+                    null,
+                fechaEstEntregaBodega:
+                    toISOorNull(d.fechaEstEntregaBodega) ||
+                    existingDespacho.fechaEstEntregaBodega ||
+                    null,
+                fechaRealEntregaBodega:
+                    toISOorNull(d.fechaRealEntregaBodega) ||
+                    existingDespacho.fechaRealEntregaBodega ||
+                    null,
+                fechaCas: toISOorNull(d.fechaCas) || existingDespacho.fechaCas || null,
+                fechaEntregaContenedorVacio:
+                    toISOorNull(d.fechaEntregaContenedorVacio) ||
+                    existingDespacho.fechaEntregaContenedorVacio ||
+                    null,
+                fechaRegistroPesos:
+                    toISOorNull(d.fechaRegistroPesos) ||
+                    existingDespacho.fechaRegistroPesos ||
+                    null,
             };
 
             console.log("🟢 Dispatch payload VALIDADO:", payload);
@@ -184,9 +245,9 @@ export default function ModalCreateDispatch({
                             label="Código Importación"
                             onChange={handleChange}
                         >
-                            {procesosDespacho.map((p) => (
+                            {eligibleProcesses.map((p) => (
                                 <MenuItem key={p._id} value={p._id}>
-                                    {p.inicio?.codigoImportacion || p._id}
+                                    {buildProcessCodeLabel(p)}
                                 </MenuItem>
                             ))}
                         </Select>

@@ -9,6 +9,7 @@ import {
   normalizeManualItem,
   buildPreshipmentPayload,
 } from "../utils/preshipmentTransformers";
+import { toDateInputValue } from "../utils/stageCreateHelpers";
 
 const initialForm = {
   procesoId: "",
@@ -54,7 +55,7 @@ const initialItemForm = {
   cajasDespachados: 0,
 };
 
-export default function usePreshipmentForm({ open, onClose, onCreated }) {
+export default function usePreshipmentForm({ open, onClose, onCreated, procesos = [] }) {
   const [form, setForm] = useState(initialForm);
   const [items, setItems] = useState([]);
   const [itemForm, setItemForm] = useState(initialItemForm);
@@ -68,6 +69,59 @@ export default function usePreshipmentForm({ open, onClose, onCreated }) {
     INCOTERMS: [],
   });
   const fileInputRef = useRef(null);
+  const buildFormFromProcess = (processId, process) => {
+    const preembarque = process?.preembarque || {};
+
+    return {
+      ...initialForm,
+      procesoId: processId || "",
+      paisOrigen: preembarque.paisOrigen || "",
+      fechaFactura: toDateInputValue(preembarque.fechaFactura),
+      valorFactura: preembarque.valorFactura ?? 0,
+      formaPago: preembarque.formaPago || "",
+      cantidad: preembarque.cantidad ?? 0,
+      um: preembarque.um || "",
+      entidadEmisoraDcp: preembarque.entidadEmisoraDcp || "",
+      numeroPermisoImportacion: preembarque.numeroPermisoImportacion || "",
+      fechaSolicitudRegimen: toDateInputValue(preembarque.fechaSolicitudRegimen),
+      cartaReg21: preembarque.cartaReg21 || "",
+      fechaSolicitudGarantia: toDateInputValue(preembarque.fechaSolicitudGarantia),
+      aseguradora: preembarque.aseguradora || "",
+      numeroGarantia: preembarque.numeroGarantia || "",
+      montoAsegurado: preembarque.montoAsegurado ?? 0,
+      fechaInicioGarantia: toDateInputValue(preembarque.fechaInicioGarantia),
+      fechaFinGarantia: toDateInputValue(preembarque.fechaFinGarantia),
+      numeroCdaGarantia: preembarque.numeroCdaGarantia || "",
+      fechaEnvioPoliza: toDateInputValue(preembarque.fechaEnvioPoliza),
+      fechaRecepcionDocumentoOriginal: toDateInputValue(preembarque.fechaRecepcionDocumentoOriginal),
+      numeroPoliza: preembarque.numeroPoliza || "",
+      incoterms: preembarque.incoterms || "",
+      fechaRecolectEstimada: toDateInputValue(preembarque.fechaRecolectEstimada),
+      fechaRecolectProveedor: toDateInputValue(preembarque.fechaRecolectProveedor),
+      fechaRecolectReal: toDateInputValue(preembarque.fechaRecolectReal),
+      fechaReqBodega: toDateInputValue(preembarque.fechaReqBodega),
+      fechaMaxReqBodega: toDateInputValue(preembarque.fechaMaxReqBodega),
+      cartaAclaratoria: preembarque.cartaAclaratoria || "",
+      certificadoOrigen: preembarque.certificadoOrigen || "",
+      listaEmpaque: preembarque.listaEmpaque || "",
+      cartaGastos: preembarque.cartaGastos || "",
+      paisProcedencia: preembarque.paisProcedencia || preembarque.paisOrigen || "",
+    };
+  };
+  const mapItemForForm = (item = {}) => ({
+    ...item,
+    deltaFechaSolicitudVsETD: toDateInputValue(item.deltaFechaSolicitudVsETD),
+    deltaFechaSolicitudVsCarga: toDateInputValue(item.deltaFechaSolicitudVsCarga),
+    ltFechaCargaHastaIngresoBodega: toDateInputValue(item.ltFechaCargaHastaIngresoBodega),
+  });
+  const hydrateProcess = (processId) => {
+    const selectedProcess = procesos.find((process) => process?._id === processId);
+    const preembarque = selectedProcess?.preembarque || {};
+
+    setForm(buildFormFromProcess(processId, selectedProcess));
+    setItems(Array.isArray(preembarque.items) ? preembarque.items.map(mapItemForForm) : []);
+    setItemForm(initialItemForm);
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -89,11 +143,20 @@ export default function usePreshipmentForm({ open, onClose, onCreated }) {
       }
     };
 
+    setForm(initialForm);
+    setItems([]);
+    setItemForm(initialItemForm);
+    setTabIndex(0);
     fetchCatalogos();
   }, [open]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    if (name === "procesoId") {
+      hydrateProcess(value);
+      return;
+    }
 
     if (name === "paisOrigen") {
       setForm((prev) => ({
@@ -199,12 +262,13 @@ export default function usePreshipmentForm({ open, onClose, onCreated }) {
     }
 
     try {
-      const payload = buildPreshipmentPayload(form, items);
+      const selectedProcess = procesos.find((process) => process?._id === form.procesoId);
+      const payload = buildPreshipmentPayload(form, items, selectedProcess?.preembarque || {});
       const procesoId = form.procesoId;
 
       const actualizado = await api.patch(`/api/process/${procesoId}/preembarque`, payload);
       toast.success("Preembarque actualizado correctamente");
-      onCreated(actualizado);
+      if (onCreated) onCreated(actualizado);
       onClose();
     } catch (err) {
       console.error("Error al actualizar preembarque", err);

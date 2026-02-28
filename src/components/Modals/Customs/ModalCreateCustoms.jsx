@@ -20,29 +20,65 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { es } from "date-fns/locale";
 
+import {
+    buildProcessCodeLabel,
+    getStageCandidates,
+    mergeTextValue,
+    toDateObject,
+} from "../../../utils/stageCreateHelpers";
+
+const initialForm = {
+    codigoImportacionId: "",
+    fechaEnvioElectronico: null,
+    fechaPagoLiquidacion: null,
+    fechaSalidaAutorizada: null,
+    tipoAforo: "",
+    refrendo: "",
+    numeroEntregaEcuapass: "",
+    numeroLiquidacion: "",
+    numeroCdaAutorizacion: "",
+    numeroCarga: "",
+    statusAduana: ""
+};
+
 export default function ModalCreateCustoms({ open, onClose, onCreated, procesos = [] }) {
-    const [form, setForm] = useState({
-        codigoImportacionId: "",
-        fechaEnvioElectronico: null,
-        fechaPagoLiquidacion: null,
-        fechaSalidaAutorizada: null,
-        tipoAforo: "",
-        refrendo: "",
-        numeroEntregaEcuapass: "",
-        numeroLiquidacion: "",
-        numeroCdaAutorizacion: "",
-        numeroCarga: "",
-        statusAduana: ""
-    });
+    const [form, setForm] = useState(initialForm);
 
     const [tipoAforoCatalogo, setTipoAforoCatalogo] = useState([]);
+    const eligibleProcesses = getStageCandidates(procesos, "postembarque", "aduana");
+    const buildFormFromProcess = (processId, process) => {
+        const aduana = process?.aduana || {};
+
+        return {
+            ...initialForm,
+            codigoImportacionId: processId || "",
+            fechaEnvioElectronico: toDateObject(aduana.fechaEnvioElectronico),
+            fechaPagoLiquidacion: toDateObject(aduana.fechaPagoLiquidacion),
+            fechaSalidaAutorizada: toDateObject(aduana.fechaSalidaAutorizada),
+            tipoAforo: aduana.tipoAforo || "",
+            refrendo: aduana.refrendo || "",
+            numeroEntregaEcuapass: aduana.numeroEntregaEcuapass || "",
+            numeroLiquidacion: aduana.numeroLiquidacion || "",
+            numeroCdaAutorizacion: aduana.numeroCdaAutorizacion || "",
+            numeroCarga: aduana.numeroCarga || "",
+            statusAduana: aduana.statusAduana || ""
+        };
+    };
 
     const handleChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+
+        if (name === "codigoImportacionId") {
+            const selectedProcess = eligibleProcesses.find((process) => process?._id === value);
+            setForm(buildFormFromProcess(value, selectedProcess));
+            return;
+        }
+
+        setForm((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleDateChange = (name, value) => {
-        setForm({ ...form, [name]: value });
+        setForm((prev) => ({ ...prev, [name]: value }));
     };
 
     const fetchTipoAforo = async () => {
@@ -88,18 +124,35 @@ export default function ModalCreateCustoms({ open, onClose, onCreated, procesos 
 
         try {
             const { codigoImportacionId, ...aduanaData } = form;
+            const selectedProcess = eligibleProcesses.find((process) => process?._id === codigoImportacionId);
+            const existingAduana = selectedProcess?.aduana || {};
 
             const payload = {
-                ...aduanaData,
+                tipoAforo: mergeTextValue(aduanaData.tipoAforo, existingAduana.tipoAforo),
+                refrendo: mergeTextValue(aduanaData.refrendo, existingAduana.refrendo),
+                numeroEntregaEcuapass: mergeTextValue(
+                    aduanaData.numeroEntregaEcuapass,
+                    existingAduana.numeroEntregaEcuapass
+                ),
+                numeroLiquidacion: mergeTextValue(
+                    aduanaData.numeroLiquidacion,
+                    existingAduana.numeroLiquidacion
+                ),
+                numeroCdaAutorizacion: mergeTextValue(
+                    aduanaData.numeroCdaAutorizacion,
+                    existingAduana.numeroCdaAutorizacion
+                ),
+                numeroCarga: mergeTextValue(aduanaData.numeroCarga, existingAduana.numeroCarga),
+                statusAduana: mergeTextValue(aduanaData.statusAduana, existingAduana.statusAduana),
                 fechaEnvioElectronico: aduanaData.fechaEnvioElectronico
                     ? aduanaData.fechaEnvioElectronico.toISOString()
-                    : null,
+                    : existingAduana.fechaEnvioElectronico || null,
                 fechaPagoLiquidacion: aduanaData.fechaPagoLiquidacion
                     ? aduanaData.fechaPagoLiquidacion.toISOString()
-                    : null,
+                    : existingAduana.fechaPagoLiquidacion || null,
                 fechaSalidaAutorizada: aduanaData.fechaSalidaAutorizada
                     ? aduanaData.fechaSalidaAutorizada.toISOString()
-                    : null,
+                    : existingAduana.fechaSalidaAutorizada || null,
             };
 
             const res = await fetch(
@@ -116,7 +169,7 @@ export default function ModalCreateCustoms({ open, onClose, onCreated, procesos 
 
             const actualizado = await res.json();
             toast.success("Aduana registrada correctamente");
-            onCreated(actualizado);
+            if (onCreated) onCreated(actualizado);
             onClose();
         } catch (err) {
             console.error(err);
@@ -130,6 +183,7 @@ export default function ModalCreateCustoms({ open, onClose, onCreated, procesos 
     useEffect(() => {
         if (open) {
             fetchTipoAforo();
+            setForm(initialForm);
         }
     }, [open]);
 
@@ -177,11 +231,9 @@ export default function ModalCreateCustoms({ open, onClose, onCreated, procesos 
                             value={form.codigoImportacionId}
                             onChange={handleChange}
                         >
-                            {procesos
-                                .filter(p => p.currentStage === "postembarque")
-                                .map(p => (
+                            {eligibleProcesses.map(p => (
                                     <MenuItem key={p._id} value={p._id}>
-                                        {p.inicio?.codigoImportacion || p._id}
+                                        {buildProcessCodeLabel(p)}
                                     </MenuItem>
                                 ))}
                         </Select>

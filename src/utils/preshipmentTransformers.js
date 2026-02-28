@@ -1,6 +1,8 @@
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 
+import { mergeArrayValue, mergeNumberValue, mergeTextValue } from "./stageCreateHelpers";
+
 dayjs.extend(customParseFormat);
 
 export const ITEM_TEMPLATE_HEADERS = [
@@ -100,47 +102,87 @@ export function normalizeManualItem(itemForm) {
   };
 }
 
-export function buildPreshipmentPayload(form, items) {
+export function buildPreshipmentPayload(form, items, existingData = {}) {
   const { procesoId, ...preembarqueData } = form;
+  const toDateOrNull = (value) => {
+    if (!value) return null;
+    if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      return new Date(`${value}T12:00:00.000Z`);
+    }
+    return new Date(value);
+  };
+  const mergeDateValue = (nextValue, currentValue) => {
+    if (!nextValue) return currentValue ?? null;
+    return toDateOrNull(nextValue);
+  };
+  const mergedItems = mergeArrayValue(items, existingData.items);
 
   return {
+    ...existingData,
     ...preembarqueData,
-    valorFactura: Number(preembarqueData.valorFactura) || 0,
-    cantidad: Number(preembarqueData.cantidad) || 0,
-    montoAsegurado: Number(preembarqueData.montoAsegurado) || 0,
-    items: items.map((item) => ({
+    paisOrigen: mergeTextValue(preembarqueData.paisOrigen, existingData.paisOrigen),
+    formaPago: mergeTextValue(preembarqueData.formaPago, existingData.formaPago),
+    um: mergeTextValue(preembarqueData.um, existingData.um),
+    entidadEmisoraDcp: mergeTextValue(preembarqueData.entidadEmisoraDcp, existingData.entidadEmisoraDcp),
+    numeroPermisoImportacion: mergeTextValue(
+      preembarqueData.numeroPermisoImportacion,
+      existingData.numeroPermisoImportacion
+    ),
+    cartaReg21: mergeTextValue(preembarqueData.cartaReg21, existingData.cartaReg21),
+    aseguradora: mergeTextValue(preembarqueData.aseguradora, existingData.aseguradora),
+    numeroGarantia: mergeTextValue(preembarqueData.numeroGarantia, existingData.numeroGarantia),
+    numeroCdaGarantia: mergeTextValue(preembarqueData.numeroCdaGarantia, existingData.numeroCdaGarantia),
+    numeroPoliza: mergeTextValue(preembarqueData.numeroPoliza, existingData.numeroPoliza),
+    incoterms: mergeTextValue(preembarqueData.incoterms, existingData.incoterms),
+    cartaAclaratoria: mergeTextValue(preembarqueData.cartaAclaratoria, existingData.cartaAclaratoria),
+    certificadoOrigen: mergeTextValue(preembarqueData.certificadoOrigen, existingData.certificadoOrigen),
+    listaEmpaque: mergeTextValue(preembarqueData.listaEmpaque, existingData.listaEmpaque),
+    cartaGastos: mergeTextValue(preembarqueData.cartaGastos, existingData.cartaGastos),
+    paisProcedencia: mergeTextValue(preembarqueData.paisProcedencia, existingData.paisProcedencia),
+    valorFactura: mergeNumberValue(preembarqueData.valorFactura, existingData.valorFactura ?? 0),
+    cantidad: mergeNumberValue(preembarqueData.cantidad, existingData.cantidad ?? 0),
+    montoAsegurado: mergeNumberValue(preembarqueData.montoAsegurado, existingData.montoAsegurado ?? 0),
+    items: mergedItems.map((item) => ({
       ...item,
       deltaFechaSolicitudVsETD: item.deltaFechaSolicitudVsETD
-        ? new Date(`${item.deltaFechaSolicitudVsETD}T12:00:00.000Z`)
+        ? toDateOrNull(item.deltaFechaSolicitudVsETD)
         : null,
       deltaFechaSolicitudVsCarga: item.deltaFechaSolicitudVsCarga
-        ? new Date(`${item.deltaFechaSolicitudVsCarga}T12:00:00.000Z`)
+        ? toDateOrNull(item.deltaFechaSolicitudVsCarga)
         : null,
       ltFechaCargaHastaIngresoBodega: item.ltFechaCargaHastaIngresoBodega
-        ? new Date(`${item.ltFechaCargaHastaIngresoBodega}T12:00:00.000Z`)
+        ? toDateOrNull(item.ltFechaCargaHastaIngresoBodega)
         : null,
     })),
-    fechaFactura: preembarqueData.fechaFactura ? new Date(preembarqueData.fechaFactura) : null,
-    fechaSolicitudRegimen: preembarqueData.fechaSolicitudRegimen
-      ? new Date(preembarqueData.fechaSolicitudRegimen)
-      : null,
-    fechaSolicitudGarantia: preembarqueData.fechaSolicitudGarantia
-      ? new Date(preembarqueData.fechaSolicitudGarantia)
-      : null,
-    fechaInicioGarantia: preembarqueData.fechaInicioGarantia ? new Date(preembarqueData.fechaInicioGarantia) : null,
-    fechaFinGarantia: preembarqueData.fechaFinGarantia ? new Date(preembarqueData.fechaFinGarantia) : null,
-    fechaEnvioPoliza: preembarqueData.fechaEnvioPoliza ? new Date(preembarqueData.fechaEnvioPoliza) : null,
-    fechaRecepcionDocumentoOriginal: preembarqueData.fechaRecepcionDocumentoOriginal
-      ? new Date(preembarqueData.fechaRecepcionDocumentoOriginal)
-      : null,
-    fechaRecolectEstimada: preembarqueData.fechaRecolectEstimada
-      ? new Date(preembarqueData.fechaRecolectEstimada)
-      : null,
-    fechaRecolectProveedor: preembarqueData.fechaRecolectProveedor
-      ? new Date(preembarqueData.fechaRecolectProveedor)
-      : null,
-    fechaRecolectReal: preembarqueData.fechaRecolectReal ? new Date(preembarqueData.fechaRecolectReal) : null,
-    fechaReqBodega: preembarqueData.fechaReqBodega ? new Date(preembarqueData.fechaReqBodega) : null,
-    fechaMaxReqBodega: preembarqueData.fechaMaxReqBodega ? new Date(preembarqueData.fechaMaxReqBodega) : null,
+    fechaFactura: mergeDateValue(preembarqueData.fechaFactura, existingData.fechaFactura),
+    fechaSolicitudRegimen: mergeDateValue(
+      preembarqueData.fechaSolicitudRegimen,
+      existingData.fechaSolicitudRegimen
+    ),
+    fechaSolicitudGarantia: mergeDateValue(
+      preembarqueData.fechaSolicitudGarantia,
+      existingData.fechaSolicitudGarantia
+    ),
+    fechaInicioGarantia: mergeDateValue(
+      preembarqueData.fechaInicioGarantia,
+      existingData.fechaInicioGarantia
+    ),
+    fechaFinGarantia: mergeDateValue(preembarqueData.fechaFinGarantia, existingData.fechaFinGarantia),
+    fechaEnvioPoliza: mergeDateValue(preembarqueData.fechaEnvioPoliza, existingData.fechaEnvioPoliza),
+    fechaRecepcionDocumentoOriginal: mergeDateValue(
+      preembarqueData.fechaRecepcionDocumentoOriginal,
+      existingData.fechaRecepcionDocumentoOriginal
+    ),
+    fechaRecolectEstimada: mergeDateValue(
+      preembarqueData.fechaRecolectEstimada,
+      existingData.fechaRecolectEstimada
+    ),
+    fechaRecolectProveedor: mergeDateValue(
+      preembarqueData.fechaRecolectProveedor,
+      existingData.fechaRecolectProveedor
+    ),
+    fechaRecolectReal: mergeDateValue(preembarqueData.fechaRecolectReal, existingData.fechaRecolectReal),
+    fechaReqBodega: mergeDateValue(preembarqueData.fechaReqBodega, existingData.fechaReqBodega),
+    fechaMaxReqBodega: mergeDateValue(preembarqueData.fechaMaxReqBodega, existingData.fechaMaxReqBodega),
   };
 }
