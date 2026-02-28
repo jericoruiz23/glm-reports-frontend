@@ -30,6 +30,7 @@ const initialForm = {
     peso: "",
     bultos: "",
     tipoContenedor: "",
+    cantidadContenedores: "",
 
     fechaEstDespachoPuerto: null,
     fechaRealDespachoPuerto: null,
@@ -96,6 +97,7 @@ export default function ModalCreateDispatch({
             const payload = {
                 numeroContainer: d.numeroContainer,
                 tipoContenedor: d.tipoContenedor,
+                cantidadContenedores: d.cantidadContenedores,
                 observaciones: d.observaciones,
 
                 peso: Number(d.peso || 0),
@@ -199,6 +201,7 @@ export default function ModalCreateDispatch({
                     <Stack spacing={2} mt={2}>
                         <TextField label="Número de Container" name="numeroContainer" value={form.numeroContainer} onChange={handleChange} />
                         <TextField label="Tipo de Contenedor" name="tipoContenedor" value={form.tipoContenedor} onChange={handleChange} />
+                        <TextField type="number" label="Cantidad de Contenedores" name="cantidadContenedores" value={form.cantidadContenedores} onChange={handleChange} />
                         <TextField type="number" label="Peso" name="peso" value={form.peso} onChange={handleChange} />
                         <DatePicker
                             label="Fecha Registro Pesos"

@@ -98,6 +98,7 @@ export const sections = [
             "peso",
             "bultos",
             "tipoContenedor",
+            "cantidadContenedores",
             "fechaEstDespachoPuerto",
             "fechaRealDespachoPuerto",
             "fechaEstEntregaBodega",
@@ -198,6 +199,7 @@ export const labels = {
 
     fechaFacturacionCostos: "Fecha Facturación Costos",
     numeroContainer: "Número Container",
+    cantidadContenedores: "Cantidad de Contenedores",
     peso: "Peso",
     bultos: "Bultos",
     tipoContenedor: "Tipo Contenedor",

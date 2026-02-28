@@ -21,6 +21,7 @@ export default function ModalEditDispatch({ open, dispatchprocess, onClose, onSu
         peso: "",
         bultos: "",
         tipoContenedor: "",
+        cantidadContenedores: "",
 
         fechaEstDespachoPuerto: "",
         fechaRealDespachoPuerto: "",
@@ -50,6 +51,7 @@ export default function ModalEditDispatch({ open, dispatchprocess, onClose, onSu
                 peso: d.peso ?? "",
                 bultos: d.bultos ?? "",
                 tipoContenedor: d.tipoContenedor || "",
+                cantidadContenedores: d.cantidadContenedores ?? "",
 
                 fechaEstDespachoPuerto: d.fechaEstDespachoPuerto?.slice(0, 10) || "",
                 fechaRealDespachoPuerto: d.fechaRealDespachoPuerto?.slice(0, 10) || "",
@@ -94,6 +96,7 @@ export default function ModalEditDispatch({ open, dispatchprocess, onClose, onSu
             const payload = {
                 numeroContainer: form.numeroContainer,
                 tipoContenedor: form.tipoContenedor,
+                cantidadContenedores: form.cantidadContenedores,
                 observaciones: form.observaciones,
 
                 peso: Number(form.peso || 0),
@@ -169,6 +172,7 @@ export default function ModalEditDispatch({ open, dispatchprocess, onClose, onSu
                 <Stack spacing={2}>
                     <TextField label="Número de Container" name="numeroContainer" value={form.numeroContainer} onChange={handleChange} />
                     <TextField label="Tipo de Contenedor" name="tipoContenedor" value={form.tipoContenedor} onChange={handleChange} />
+                    <TextField type="number" label="Cantidad de Contenedores" name="cantidadContenedores" value={form.cantidadContenedores} onChange={handleChange} />
                     <TextField type="number" label="Peso" name="peso" value={form.peso} onChange={handleChange} />
                     <TextField type="number" label="Bultos" name="bultos" value={form.bultos} onChange={handleChange} />
                 </Stack>
